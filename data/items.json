@@ -2,55 +2,79 @@
   {
     "id": 1,
     "name": "Kofola",
-    "price": 60,
+    "price": 40,
     "category": "Nápoje"
   },
   {
     "id": 2,
-    "name": "Presso",
+    "name": "exPresso",
     "price": 40,
     "category": "Nápoje"
   },
   {
     "id": 3,
     "name": "Laté",
-    "price": 50,
+    "price": 60,
     "category": "Nápoje"
   },
   {
     "id": 4,
     "name": "Dort",
-    "price": 60,
+    "price": 80,
     "category": "Jídlo"
   },
   {
     "id": 5,
-    "name": "Medovník",
-    "price": 45,
+    "name": "Brownie",
+    "price": 55,
     "category": "Jídlo"
   },
   {
     "id": 6,
     "name": "Klobása",
-    "price": 75,
+    "price": 80,
     "category": "Jídlo"
   },
   {
     "id": 7,
-    "name": "Steak",
-    "price": 150,
+    "name": "Kuřecí Steak",
+    "price": 100,
     "category": "Jídlo"
   },
   {
     "id": 8,
     "name": "Pivo",
-    "price": 40,
+    "price": 45,
     "category": "Nápoje"
   },
   {
     "id": 9,
     "name": "Monster",
-    "price": 60,
+    "price": 50,
+    "category": "Nápoje"
+  },
+  {
+    "id": 12,
+    "name": "Frisco",
+    "price": 40,
+    "category": "Nápoje"
+  },
+  {
+    "id": 13,
+    "name": "Agrezz",
+    "price": 50,
+    "category": "Ostatní"
+  },
+  {
+    "id": 14,
+    "name": "Birell",
+    "price": 40,
+    "category": "Ostatní"
+  },
+  {
+    "id": 15,
+    "name": "Cappuccino",
+    "price": 50,
     "category": "Nápoje"
   }
 ]
