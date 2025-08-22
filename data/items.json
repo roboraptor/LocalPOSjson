@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Kofola",
+    "price": 60,
+    "category": "Nápoje"
+  },
+  {
+    "id": 2,
+    "name": "Presso",
+    "price": 40,
+    "category": "Nápoje"
+  },
+  {
+    "id": 3,
+    "name": "Laté",
+    "price": 50,
+    "category": "Nápoje"
+  },
+  {
+    "id": 4,
+    "name": "Dort",
+    "price": 60,
+    "category": "Jídlo"
+  },
+  {
+    "id": 5,
+    "name": "Medovník",
+    "price": 45,
+    "category": "Jídlo"
+  },
+  {
+    "id": 6,
+    "name": "Klobása",
+    "price": 75,
+    "category": "Jídlo"
+  },
+  {
+    "id": 7,
+    "name": "Steak",
+    "price": 150,
+    "category": "Jídlo"
+  },
+  {
+    "id": 8,
+    "name": "Pivo",
+    "price": 40,
+    "category": "Nápoje"
+  },
+  {
+    "id": 9,
+    "name": "Monster",
+    "price": 60,
+    "category": "Nápoje"
+  }
+]

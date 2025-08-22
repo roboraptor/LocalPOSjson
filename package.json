@@ -1,0 +1,26 @@
+{
+  "name": "njs-pos-sqlite",
+  "version": "1.0.0",
+  "description": "Pos page saves receipt to sqlite or something.",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "roboraptor66",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "next": "^15.3.2",
+    "path": "^0.12.7",
+    "react": "^19.1.0",
+    "react-bootstrap": "^2.10.9",
+    "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  }
+}
