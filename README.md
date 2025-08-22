@@ -1,3 +1,3 @@
-NodeJS app
-npm run dev
-localhost:3000
+- NodeJS app
+- npm run dev
+- localhost:3000
