@@ -51,6 +51,7 @@ Aplikace poběží na [http://localhost:3000](http://localhost:3000).
 - Opravit přidání vlastní položky, aby mohla být i sleva (negativní hodnota)
 - V poli „Cena“ zakázat zadávání jiných znaků než číslo a mínus
 - Doplnit možnost vlastních kategorií
+- Heartbeat do headeru jestli je server alive
 
 ---
 

@@ -1,0 +1,67 @@
+/* ================================
+   pos.css (POS specifické styly)
+   - grid katalogu položek
+   - tlačítka .btn-items a jejich varianty
+   ================================ */
+
+/* Grid pro katalog (legacy .buttons + novější .btn-grid) */
+.buttons,
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--item-min), 1fr));
+  grid-auto-rows: var(--item-row);
+  gap: var(--sp-4);
+  align-items: stretch;
+  max-width: 100%;
+}
+
+/* Breakpointy – menší dlaždice na mobilech */
+@media (max-width: 720px) {
+  :root {
+    --item-min: 100px;
+    --item-row: 104px;
+  }
+}
+
+/* Katalogové tlačítko (touch-friendly, 2 řádky) */
+.btn-items {
+  transition: none; transform: none; /* žádné on-click efekty */
+  display: grid; grid-template-rows: 1fr auto; gap: 6px;
+  align-items: center; justify-items: start;
+  width: 100%; min-height: var(--item-row);
+  padding: var(--item-pad) var(--sp-4);
+  text-align: left; white-space: normal; overflow-wrap: anywhere;
+  border-radius: var(--radius-sm);
+}
+.btn-items:hover, .btn-items:active { filter: none; transform: none; }
+
+/* Vnitřek: ikona + název */
+.btn-items__top {
+  display: grid; grid-template-columns: var(--item-icon) 1fr; gap: 10px; width: 100%;
+}
+.btn-items__icon {
+  width: var(--item-icon); height: var(--item-icon);
+  display: grid; place-items: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,.08);
+}
+.btn-items__title {
+  font-weight: 600; line-height: 1.2;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Spodní řádek: badge vlevo, cena vpravo */
+.btn-items__bottom {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;
+  font-variant-numeric: var(--tabular);
+}
+.btn-items__badge {
+  font-size: 12px; padding: 2px 6px; border-radius: 999px; border: 1px dashed var(--border); opacity: .75;
+}
+.btn-items__price { font-weight: 700; }
+
+/* Větší varianta dlaždice */
+.btn-items--lg {
+  --item-row: 112px;
+  --item-icon: 28px;
+}

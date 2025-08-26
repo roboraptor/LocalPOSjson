@@ -1,420 +1,182 @@
 /* ================================
+   globals.css (core)
+   - necháváme reset, tokens, layout, utilities, header, buttons a print
+   - přidáváme importy na oddělené části: pos, receipts, modal
+   ================================ */
+
+/* --- imports na dílčí moduly --- */
+@import './pos.css';        /* POS specifika – katalogový grid, .btn-items, zvětšené dlaždice */
+@import './receipts.css';   /* styl pro stránku /receipts */
+@import './modal.css';      /* potvrzovací modal */
+
+/* ================================
    0) CSS RESET + BASE
    ================================ */
-   *,
-   *::before,
-   *::after { box-sizing: border-box; }
-   
-   html, body { height: 100%; }
-   
-   body {
-     margin: 0;
-     font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-     line-height: 1.5;
-     -webkit-font-smoothing: antialiased;
-     text-rendering: optimizeLegibility;
-     background: var(--bg);
-     color: var(--fg);
-   }
-   
-   /* Odkazy a focus */
-   a { color: inherit; text-decoration: none; }
-   :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-   
-   /* Obrázky & typografie */
-   img, svg, video, canvas { display: block; max-width: 100%; }
-   h1,h2,h3,h4,h5,h6 { margin: 0 0 .5rem; line-height: 1.2; }
-   p { margin: 0 0 1rem; }
-   code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-   
-   /* ================================
-      1) DESIGN TOKENS (proměnné)
-      ================================ */
-   :root {
-     /* Barvy */
-     --bg: #0f1115;            /* základ pozadí */
-     --fg: #f5f7fb;            /* základ text */
-     --muted: #9aa3b2;         /* sekundární text */
-     --surface: #161a21;       /* karty, panely */
-     --surface-2: #0b0d11;     /* hlubší pozadí */
-     --border: #2a3240;
-   
-     --primary: #3b82f6;       /* modrá – primární akce */
-     --primary-600: #2563eb;
-     --success: #22c55e;       /* zelená – potvrzení */
-     --success-700: #16a34a;
-     --danger: #ef4444;        /* červená – smazání */
-     --danger-700: #dc2626;
-     --warning: #f59e0b;
-     --info: #38bdf8;
-   
-     /* Typografie & radius & shadow */
-     --radius: 12px;
-     --radius-sm: 8px;
-     --shadow-sm: 0 2px 6px rgba(0,0,0,.25);
-     --shadow-md: 0 6px 24px rgba(0,0,0,.24);
-   
-     /* Mezery (8px scale) */
-     --sp-1: 4px;
-     --sp-2: 8px;
-     --sp-3: 12px;
-     --sp-4: 16px;
-     --sp-5: 20px;
-     --sp-6: 24px;
-     --sp-8: 32px;
-     --sp-10: 40px;
-   
-     /* Tabular nums pro ceny */
-     --tabular: tabular-nums lining-nums;
-   }
-   
-   /* Volitelné: světlé schéma, kdyby ses ho rozhodl použít */
-   @media (prefers-color-scheme: light) {
-     :root {
-       --bg: #f6f7fb;
-       --fg: #121417;
-       --muted: #667085;
-       --surface: #ffffff;
-       --surface-2: #f1f3f7;
-       --border: #e5e7eb;
-     }
-   }
-   
-   /* ================================
-      2) LAYOUT
-      ================================ */
-   .container {
-     max-width: 960px;
-     margin: var(--sp-10) auto;
-     padding: 0 var(--sp-4);
-   }
-   
-   .pageTitle {
-     font-size: 28px;
-     font-weight: 700;
-     margin: var(--sp-2) 0 var(--sp-4);
-   }
-   
-   /* Hlavní dvousloupcový layout pro pokladnu */
-   .mainLayout {
-     display: flex;
-     min-height: 100vh;
-   }
-   
-   /* Levý obsah (produkty) */
-   .leftColumn {
-     flex: 1;
-     padding: var(--sp-10) var(--sp-8);
-     overflow-y: auto;
-   }
-   
-   /* Pravý panel (účtenka) */
-   .receiptColumn {
-     width: 360px;
-     background: var(--surface);
-     color: var(--fg);
-     border-left: 1px solid var(--border);
-     padding: var(--sp-6);
-     position: sticky;
-     top: 0;
-     height: 100vh;
-     overflow-y: auto;
-     box-shadow: -6px 0 16px rgba(0,0,0,.12);
-   }
-   
-   /* Mřížka tlačítek produktů */
-   .buttons {
-     --cols: 1; /* výchozí (mobil) */
-     display: grid;
-     gap: var(--sp-4);
-     grid-template-columns: repeat(var(--cols), 1fr);
-     align-items: stretch; /* ať jsou položky stejně vysoké v řádku */
-   }
-
-   /* breakpoints: stejné sloupce pro všechny sekce */
-  @media (min-width: 480px)  { .buttons { --cols: 2; } }
-  @media (min-width: 768px)  { .buttons { --cols: 3; } }
-  @media (min-width: 992px)  { .buttons { --cols: 4; } }
-  @media (min-width: 1200px) { .buttons { --cols: 5; } }
-   
-/* jednotná výška buněk a čitelnost delších názvů */
-.buttons .btn {
-  width: 100%;
-  height: 100%;             /* vyplnit buňku */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;       /* delší názvy na více řádků, centrované */
-  white-space: normal;
-  overflow-wrap: anywhere;
-  min-height: 52px;         /* pocitově „klikací“ plocha */
-  /* můžeš přidat i lehký padding navíc, když bude potřeba */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  background: var(--bg);
+  color: var(--fg);
 }
 
-   /* Responzivní grid (obecný) */
-   .grid {
-     display: grid;
-     grid-template-columns: 1fr;
-     gap: var(--sp-4);
-   }
-   @media (min-width: 720px) {
-     .grid { grid-template-columns: 1fr 1fr; }
-   }
-   
-   /* ================================
-      3) KOMPONENTY
-      ================================ */
-   
-   /* Karty */
-   .card {
-     background: var(--surface);
-     border: 1px solid var(--border);
-     border-radius: var(--radius);
-     box-shadow: var(--shadow-sm);
-   }
-   
-   /* Alerty */
-   .alert {
-     padding: var(--sp-3) var(--sp-4);
-     border-radius: var(--radius-sm);
-     border: 1px solid var(--border);
-     background: var(--surface);
-     margin-bottom: var(--sp-4);
-   }
-   .alert-error { background: rgba(239, 68, 68, .12); color: #fecaca; border-color: rgba(239,68,68,.35); }
-   .alert-info  { background: rgba(56, 189, 248, .12); color: #bae6fd; border-color: rgba(56,189,248,.35); }
-   
-   /* Skeleton */
-   .skeleton {
-     height: 140px;
-     border-radius: var(--radius);
-     background: linear-gradient(90deg, #1d232e 25%, #2b3443 37%, #1d232e 63%);
-     background-size: 400% 100%;
-     animation: shimmer 1.4s ease infinite;
-     margin-bottom: var(--sp-4);
-   }
-   @keyframes shimmer {
-     0% { background-position: 100% 0; }
-     100% { background-position: -100% 0; }
-   }
-   
-   /* Tlačítka – jednotný systém */
-   .btn {
-     appearance: none;
-     border: 1px solid transparent;
-     border-radius: var(--radius-sm);
-     padding: 10px 14px;
-     cursor: pointer;
-     font-weight: 600;
-     background: var(--surface-2);
-     color: var(--fg);
-     transition: transform .06s ease, filter .15s ease, background .15s ease;
-   }
-   .btn:hover { filter: brightness(1.05); }
-   .btn:active { transform: translateY(1px); }
-   
-   .btn-primary { background: var(--primary); border-color: var(--primary-600); color: #fff; }
-   .btn-success { background: var(--success); border-color: var(--success-700); color: #07120a; }
-   .btn-danger  { background: var(--danger);  border-color: var(--danger-700);  color: #fff; }
-   .btn-warning { background: var(--warning); border-color: #d97706;  color: #fff; }
-   .btn-ghost   { background: transparent; color: var(--fg); border-color: var(--border); }
-   .btn-block   { width: 100%; }
- 
-   /* .buttons .btn-success {
-  /*  white-space: normal; /* umožní zalomení textu */
-  /*  overflow-wrap: break-word; /* když je text dlouhý */
-    
+/* Odkazy a focus */
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-   /* Speciální akční tlačítka (původní saveButton) */
-   .saveButton { /* zpětná kompatibilita – můžeš nahradit .btn-primary */
-     margin-top: var(--sp-6);
-     width: 220px;
-     font-weight: 700;
-     font-size: 18px;
-     padding: 12px 16px;
-     background: var(--primary);
-     color: #fff;
-     border-radius: var(--radius-sm);
-     border: 1px solid var(--primary-600);
-   }
-   .saveButton:hover { filter: brightness(1.05); }
-   
-   /* Pomocné textové utility */
-   .muted { color: var(--muted); }
-   
-   /* ================================
-      4) ÚČTENKA (BEM)
-      ================================ */
-   
-   /* Wrapper účtenky (vlevo i vpravo použitelný) */
-   .receipt {
-     display: flex;
-     flex-direction: column;
-     gap: var(--sp-2);
-     background: #fff;                   /* účtenka je záměrně světlá pro tisk/kontrast */
-     color: #111827;
-     padding: var(--sp-5);
-     border: 1px dashed #cbd5e1;
-     border-radius: var(--radius-sm);
-     box-shadow: 0 0 0 1px #e5e7eb inset, 0 6px 14px rgba(0,0,0,.06);
-     font-feature-settings: "tnum";
-     font-variant-numeric: var(--tabular);
-   }
-   
-   .receipt__title {
-     margin: 0 0 var(--sp-3);
-     font-size: 20px;
-     border-bottom: 1px solid #e5e7eb;
-     padding-bottom: var(--sp-2);
-     font-weight: 700;
-   }
-   
-   .receipt__row {
-     display: flex;
-     justify-content: space-between;
-     gap: var(--sp-4);
-     padding: 6px 0;
-     border-bottom: 1px dashed #e5e7eb;
-     font-size: 16px;
-   }
-   .receipt__row:last-child { border-bottom: none; }
-   .receipt__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-   .receipt__price { font-variant-numeric: var(--tabular); }
-   
-   .receipt__total {
-     margin-top: var(--sp-3);
-     display: flex;
-     justify-content: space-between;
-     border-top: 2px solid #111827;
-     padding-top: var(--sp-2);
-     font-weight: 800;
-     font-size: 18px;
-   }
-   .receipt__meta { color: #6b7280; font-size: 12px; }
-   
-   /* Verze pro stránku /receipts */
-   .receiptCard { overflow: hidden; }
-   .receiptHeader {
-     display: flex;
-     align-items: center;
-     justify-content: space-between;
-     padding: var(--sp-4);
-     border-bottom: 1px solid var(--border);
-   }
-   .receiptTitle { font-weight: 800; }
-   .receiptSub { color: var(--muted); font-size: 12px; }
-   
-   .receiptBody { padding: var(--sp-3) var(--sp-4); }
-   .receiptRow {
-     display: flex;
-     justify-content: space-between;
-     padding: 6px 0;
-     border-bottom: 1px dashed var(--border);
-   }
-   .receiptRow:last-child { border-bottom: none; }
-   .itemName { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-   .itemPrice { font-variant-numeric: var(--tabular); }
-   
-   .receiptTotal {
-     display: flex;
-     justify-content: space-between;
-     padding: var(--sp-4);
-     border-top: 2px solid #e5e7eb;
-     font-weight: 800;
-   }
-   .totalPrice { font-variant-numeric: var(--tabular); }
-   
-   /* ================================
-      5) PRINT STYLES – ať jde účtenku vytisknout hezky
-      ================================ */
-   @media print {
-     body { background: #fff; color: #111; }
-     .mainLayout, .leftColumn, .receiptColumn, .container { all: unset; }
-     .receipt { box-shadow: none; border-color: #ddd; }
-     .btn, .saveButton, .alert, .skeleton { display: none !important; }
-   }
-   
-   /* padding pro card */
-.cardPad { 
-  padding: var(--sp-4); 
+/* Obrázky & typografie */
+img, svg, video, canvas { display: block; max-width: 100%; }
+h1,h2,h3,h4,h5,h6 { margin: 0 0 .5rem; line-height: 1.2; }
+p { margin: 0 0 1rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+/* ================================
+   1) DESIGN TOKENS (proměnné)
+   ================================ */
+:root {
+  /* Barvy */
+  --bg: #0f1115;            /* základ pozadí */
+  --fg: #f5f7fb;            /* základ text */
+  --muted: #9aa3b2;         /* sekundární text */
+  --surface: #161a21;       /* karty, panely */
+  --surface-2: #0b0d11;     /* hlubší pozadí */
+  --border: #2a3240;
+
+  --primary: #3b82f6;       /* modrá – primární akce */
+  --primary-600: #2563eb;
+  --success: #22c55e;       /* zelená – potvrzení */
+  --success-700: #16a34a;
+  --danger: #ef4444;        /* červená – smazání */
+  --danger-700: #dc2626;
+  --warning: #ffd900;
+  --warning-700: #ff6f00; /* tmavší oranžová */
+  --info: #38bdf8;
+
+  /* Typografie & radius & shadow */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 2px 6px rgba(0,0,0,.25);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.24);
+
+  /* Mezery (8px scale) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  /* Tabular nums pro ceny */
+  --tabular: tabular-nums lining-nums;
+
+  /* POS rozměry (jen pro katalog tlačítek) */
+  --item-min: 170px;     /* min. šířka dlaždice */
+  --item-row: 96px;      /* výška řádku gridu => stejné výšky */
+  --item-pad: 12px;      /* vnitřní odsazení tlačítka */
+  --item-icon: 26px;     /* velikost ikony */
 }
 
-/* jednoduché formulářové styly */
+/* Volitelné: světlé schéma */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f7fb;
+    --fg: #121417;
+    --muted: #667085;
+    --surface: #ffffff;
+    --surface-2: #f1f3f7;
+    --border: #e5e7eb;
+  }
+}
+
+/* ================================
+   2) LAYOUT (core)
+   ================================ */
+.container {
+  max-width: 960px;
+  margin: var(--sp-10) auto;
+  padding: 0 var(--sp-4);
+}
+.pageTitle { font-size: 28px; font-weight: 700; margin: var(--sp-2) 0 var(--sp-4); }
+
+/* Hlavní dvousloupcový layout pro pokladnu */
+.mainLayout { display: flex; min-height: 100vh; }
+.leftColumn { flex: 1; padding: var(--sp-10) var(--sp-8); overflow-y: auto; }
+.receiptColumn {
+  width: 360px; background: var(--surface); color: var(--fg);
+  border-left: 1px solid var(--border); padding: var(--sp-6);
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  box-shadow: -6px 0 16px rgba(0,0,0,.12);
+}
+
+/* Obecný responzivní grid (zůstává v core) */
+.grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-4); }
+@media (min-width: 720px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+/* ================================
+   3) KOMPONENTY core (karty, alerty, tlačítka)
+   ================================ */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+
+.alert { padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); margin-bottom: var(--sp-4); }
+.alert-error { background: rgba(239, 68, 68, .12); color: #fecaca; border-color: rgba(239,68,68,.35); }
+.alert-info  { background: rgba(56, 189, 248, .12); color: #bae6fd; border-color: rgba(56,189,248,.35); }
+
+.skeleton {
+  height: 140px; border-radius: var(--radius);
+  background: linear-gradient(90deg, #1d232e 25%, #2b3443 37%, #1d232e 63%);
+  background-size: 400% 100%; animation: shimmer 1.4s ease infinite; margin-bottom: var(--sp-4);
+}
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+/* Tlačítka (základ) */
+.btn {
+  appearance: none; border: 1px solid transparent; border-radius: var(--radius-sm);
+  padding: 10px 14px; cursor: pointer; font-weight: 600;
+  background: var(--surface-2); color: var(--fg);
+  transition: transform .06s ease, filter .15s ease, background .15s ease;
+}
+.btn:hover { filter: brightness(1.05); }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--primary); border-color: var(--primary-600); color: #fff; }
+.btn-success { background: var(--success); border-color: var(--success-700); color: #000; }
+.btn-danger  { background: var(--danger);  border-color: var(--danger-700);  color: #fff; }
+.btn-warning { background: var(--warning); border-color: var(--warning-700);  color: #000; }
+.btn-ghost   { background: transparent; color: var(--fg); border-color: var(--border); }
+.btn-block   { width: 100%; }
+
+/* Utilities */
+.cardPad { padding: var(--sp-4); }
 .formRow { display: grid; gap: var(--sp-2); margin-bottom: var(--sp-3); }
 .label { font-weight: 600; color: var(--muted); font-size: 14px; }
-.input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--fg);
-}
+.input { width: 100%; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface-2); color: var(--fg); }
 .input:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  font-size: 12px;
-  border-radius: 8px;
-  background: var(--primary);
-  color: #fff;
-  margin-left: 6px;
-}
+.badge { display: inline-block; padding: 2px 8px; font-size: 12px; border-radius: 8px; background: var(--primary); color: #fff; margin-left: 6px; }
 .badge-staff { background: var(--danger); }
 
+/* Header (ponecháme v core) */
+.siteHeader { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--sp-3) var(--sp-4); position: sticky; top: 0; z-index: 100; }
+.siteHeader__inner { display: flex; align-items: center; justify-content: space-between; max-width: 960px; margin: 0 auto; }
+.siteHeader__logo { font-size: 20px; font-weight: 700; }
+.siteHeader__nav { display: flex; gap: var(--sp-4); }
+.siteHeader__link { color: var(--fg); font-weight: 500; padding: 6px 10px; border-radius: var(--radius-sm); transition: background .2s ease; }
+.siteHeader__link:hover { background: var(--surface-2); }
+.siteHeader__link.active { background: var(--primary); color: #fff; }
+.sectionTitle { font-size: 18px; font-weight: 700; margin: var(--sp-4) 0 var(--sp-2); }
 
-/* Header */
-.siteHeader {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: var(--sp-3) var(--sp-4);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.siteHeader__inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 960px;
-  margin: 0 auto;
-}
-.siteHeader__logo {
-  font-size: 20px;
-  font-weight: 700;
-}
-.siteHeader__nav {
-  display: flex;
-  gap: var(--sp-4);
-}
-.siteHeader__link {
-  color: var(--fg);
-  font-weight: 500;
-}
-.siteHeader__link:hover {
-  text-decoration: underline;
+/* PRINT zůstává zde, ať funguje univerzálně */
+@media print {
+  body { background: #fff; color: #111; }
+  .mainLayout, .leftColumn, .receiptColumn, .container { all: unset; }
+  .receipt { box-shadow: none; border-color: #ddd; }
+  .btn, .saveButton, .alert, .skeleton { display: none !important; }
 }
 
-.siteHeader__link {
-  color: var(--fg);
-  font-weight: 500;
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  transition: background 0.2s ease;
-}
-
-.siteHeader__link:hover {
-  background: var(--surface-2);
-}
-
-.siteHeader__link.active {
-  background: var(--primary);
-  color: #fff;
-}
-
-.sectionTitle {
-  font-size: 18px;
-  font-weight: 700;
-  margin: var(--sp-4) 0 var(--sp-2);
-}
+/* ================================
+   KONEC globals.css (core)
+   ================================ */

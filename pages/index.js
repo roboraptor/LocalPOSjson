@@ -5,6 +5,8 @@ const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' 
 
 export default function Home() {
   const [receipt, setReceipt] = useState([]);
+  const [savedModalOpen, setSavedModalOpen] = useState(false);
+  const hideTimerRef = useRef(null);
 
   // položky z API
   const [menuItems, setMenuItems] = useState([]);
@@ -21,7 +23,13 @@ export default function Home() {
         setItemsLoading(false);
       }
     })();
+
+    // cleanup auto-hide timeru modalu při unmountu
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
   }, []);
+
   const CATEGORIES = ['Nápoje', 'Jídlo', 'Ostatní'];
   const grouped = CATEGORIES.map(cat => ({
     cat,
@@ -55,6 +63,17 @@ export default function Home() {
     setShowCustom(false);
   };
 
+  // --- modal helpery ---
+  const openSavedModal = () => {
+    setSavedModalOpen(true);
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    hideTimerRef.current = setTimeout(() => setSavedModalOpen(false), 5000);
+  };
+  const closeSavedModal = () => {
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    setSavedModalOpen(false);
+  };
+
   const saveReceipt = async () => {
     if (receipt.length === 0) { alert('Účtenka je prázdná.'); return; }
     try {
@@ -68,10 +87,12 @@ export default function Home() {
         }),
       });
       if (!res.ok) throw new Error('Chyba při ukládání.');
-      alert('Účtenka byla uložena.');
+
+      // ✅ vyčisti hned a ukaž modal (bez blokujícího alertu)
       clearReceipt();
       setIssuedTo('');
       setIsStaff(false);
+      openSavedModal();
     } catch (e) {
       alert(e.message || 'Chyba při ukládání.');
     }
@@ -84,38 +105,33 @@ export default function Home() {
       {/* Levý sloupec – nabídka + vlastní položka + na jméno + akce */}
       <div className="leftColumn">
         <div className="container" style={{ margin: 0, padding: 0 }}>
-          <h1 className="pageTitle">Lokální pokladna</h1>
-          <p className="muted" style={{ marginBottom: 16 }}>
-            Přidej položky do účtenky kliknutím. Vpravo se průběžně počítá součet.
-          </p>
 
-            {/* 1) katalog položek (podle kategorií) */}
-            {itemsLoading ? (
+          {/* 1) katalog položek (podle kategorií) */}
+          {itemsLoading ? (
             <>
-                <div className="card skeleton" />
-                <div className="card skeleton" />
+              <div className="card skeleton" />
+              <div className="card skeleton" />
             </>
-            ) : (
+          ) : (
             grouped.map(({ cat, items }) => (
-                items.length > 0 && (
+              items.length > 0 && (
                 <section key={cat} style={{ marginBottom: 16 }}>
-                    <h2 className="sectionTitle">{cat}</h2>
-                    <div className="buttons">
+                  <h2 className="sectionTitle">{cat}</h2>
+                  <div className="buttons">
                     {items.map(item => (
-                        <button
+                      <button
                         key={item.id ?? `${item.name}-${item.price}`}
                         className="btn btn-success"
                         onClick={() => addItem(item)}
-                        >
+                      >
                         {item.name}<br />{czk.format(item.price)}
-                        </button>
+                      </button>
                     ))}
-                    </div>
+                  </div>
                 </section>
-                )
+              )
             ))
-            )}
-
+          )}
 
           {/* 2) karta: vlastní položka + na jméno */}
           <h2 className="sectionTitle">Možnosti</h2>
@@ -165,18 +181,13 @@ export default function Home() {
             )}
 
             {/* b) Na jméno (staff / zákazník) */}
-            
-              {' '}
-            
             {!showNameForm ? (
               <button
                 className="btn btn-warning"
                 onClick={() => {
                   setShowNameForm(true);
                   setIsStaff(true); // automaticky nastaví Staff = true
-                  setTimeout(() => {
-                    issuedToRef.current?.focus();
-                  }, 0);
+                  setTimeout(() => { issuedToRef.current?.focus(); }, 0);
                 }}
               >
                 + Na jméno
@@ -289,6 +300,20 @@ export default function Home() {
           </div>
         )}
       </aside>
+
+      {/* ✅ neblokující potvrzovací modal */}
+      {savedModalOpen && (
+        <div className="modalOverlay" role="status" aria-live="polite">
+          <div className="modalCard">
+            <div className="modalIcon">✅</div>
+            <div className="modalTitle">Účtenka uložena</div>
+            <p className="modalText muted">Můžeš pokračovat další účtenkou.</p>
+            <div className="modalActions">
+              <button className="btn btn-primary" onClick={closeSavedModal}>Pokračovat</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
