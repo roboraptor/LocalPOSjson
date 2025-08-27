@@ -111,7 +111,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 }
 
 /* Obecný responzivní grid (zůstává v core) */
-.grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-4); }
+.grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
 @media (min-width: 720px) { .grid { grid-template-columns: 1fr 1fr; } }
 
 /* ================================

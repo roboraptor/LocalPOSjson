@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import * as Fa from 'react-icons/fa';
+import * as Fa from 'react-icons/fa6';
 import IconPicker from '../components/IconPicker';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
@@ -176,7 +176,7 @@ export default function ItemsAdmin() {
 
 
           {/* Seznam položek */}
-          <div className="grid">
+          <div className="grid"  >
             {items.map(item => (
               <section key={item.id} className="card cardPad">
                 <header className="receiptHeader" style={{ padding: 0, borderBottom: 'none', alignItems: 'center' }}>

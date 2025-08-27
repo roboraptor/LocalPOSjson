@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import * as Fa from 'react-icons/fa';
+import * as Fa from 'react-icons/fa6';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
@@ -122,7 +122,7 @@ export default function Home() {
                   <div className="buttons">
                     {items.map(item => (
                       <button
-                        className="btn-items btn-success"
+                        className="btn-items btn-success btn-items--tri"
                         key={item.id ?? `${item.name}-${item.price}-${item.icon}`}
                         onClick={() => addItem(item)}
                       >
@@ -130,16 +130,20 @@ export default function Home() {
                         const Icon = (item.icon && Fa[item.icon]) ? Fa[item.icon] : Fa.FaUtensils;
                           return (
                             <>
-                              <div class="btn-items__top">
-                                <div class="btn-items__title">{item.name}</div>
+                             
+                              <div class="btn-items__title">
+                                {item.name}
                               </div>
+                              
                               <div class="btn-items__icon">
                                 <Icon />
                               </div>
-                              <div class="btn-items__bottom">
-                                {/*<span class="btn-items__badge">NOVÉ</span>*/}
-                                <span class="btn-items__price">{czk.format(item.price)}</span>
+                              
+                                
+                              <div class="btn-items__price">
+                                {czk.format(item.price)}
                               </div>
+                              
                             </>
                           );
                         })()}

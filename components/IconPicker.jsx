@@ -1,6 +1,6 @@
 // components/IconPicker.jsx
 import { useMemo, useState } from "react";
-import * as Fa from "react-icons/fa";
+import * as Fa from "react-icons/fa6";
 
 const ALL_FA = Object.entries(Fa)
   .filter(([name]) => name.startsWith("Fa"))
@@ -9,7 +9,7 @@ const ALL_FA = Object.entries(Fa)
 export default function IconPicker({ value, onChange, placeholder = "Hledat ikonu…" }) {
   const [q, setQ] = useState("");
   const [page, setPage] = useState(0);
-  const pageSize = 48;
+  const pageSize = 20;
 
   const list = useMemo(() => {
     const s = q.trim().toLowerCase();

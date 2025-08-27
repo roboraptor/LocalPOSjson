@@ -4,105 +4,111 @@
     "name": "Kofola",
     "price": 40,
     "category": "Nápoje",
-    "position": 2
-  },
-  {
-    "id": 18,
-    "name": "pívo",
-    "price": 10,
-    "category": "Nápoje",
-    "icon": "FaBeer",
-    "position": 3
+    "position": 1,
+    "icon": "FaBeerMugEmpty"
   },
   {
     "id": 2,
     "name": "Espresso",
     "price": 40,
     "category": "Nápoje",
-    "position": 4
+    "position": 2,
+    "icon": "FaMugSaucer"
   },
   {
     "id": 3,
     "name": "Laté",
     "price": 60,
     "category": "Nápoje",
-    "position": 5
+    "position": 3,
+    "icon": "FaMugSaucer"
   },
   {
     "id": 4,
     "name": "Dort",
     "price": 80,
     "category": "Jídlo",
-    "position": 6
+    "position": 4,
+    "icon": "FaCheese"
   },
   {
     "id": 5,
     "name": "Brownie",
     "price": 55,
     "category": "Jídlo",
-    "position": 7
+    "position": 5,
+    "icon": "FaCheese"
   },
   {
     "id": 6,
     "name": "Klobása",
     "price": 80,
     "category": "Jídlo",
-    "position": 8
+    "position": 6,
+    "icon": "FaHotdog"
   },
   {
     "id": 7,
     "name": "Kuřecí Steak",
     "price": 100,
     "category": "Jídlo",
-    "position": 9
+    "position": 7,
+    "icon": "FaDrumstickBite"
   },
   {
     "id": 8,
     "name": "Pivo",
     "price": 45,
     "category": "Nápoje",
-    "position": 10
+    "position": 8,
+    "icon": "FaBeerMugEmpty"
   },
   {
     "id": 9,
     "name": "Monster",
     "price": 50,
     "category": "Nápoje",
-    "position": 11
+    "position": 9,
+    "icon": "FaBottleWater"
   },
   {
     "id": 12,
     "name": "Frisco",
     "price": 40,
     "category": "Nápoje",
-    "position": 12
+    "position": 10,
+    "icon": "FaBottleWater"
   },
   {
     "id": 13,
     "name": "Agrezz",
     "price": 50,
     "category": "Ostatní",
-    "position": 13
+    "position": 11,
+    "icon": "FaCubes"
   },
   {
     "id": 14,
     "name": "Birell",
     "price": 40,
-    "category": "Ostatní",
-    "position": 14
+    "category": "Nápoje",
+    "position": 12,
+    "icon": "FaBottleWater"
   },
   {
     "id": 15,
     "name": "Cappuccino",
     "price": 50,
     "category": "Nápoje",
-    "position": 15
+    "position": 13,
+    "icon": "FaMugSaucer"
   },
   {
     "id": 16,
     "name": "Načůrat",
     "price": 20,
     "category": "Nápoje",
-    "position": 16
+    "position": 14,
+    "icon": "FaGlassWaterDroplet"
   }
 ]
