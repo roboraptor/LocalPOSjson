@@ -75,11 +75,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   /* Tabular nums pro ceny */
   --tabular: tabular-nums lining-nums;
 
-  /* POS rozměry (jen pro katalog tlačítek) */
-  --item-min: 170px;     /* min. šířka dlaždice */
-  --item-row: 96px;      /* výška řádku gridu => stejné výšky */
-  --item-pad: 12px;      /* vnitřní odsazení tlačítka */
-  --item-icon: 26px;     /* velikost ikony */
+
 }
 
 /* Volitelné: světlé schéma */
@@ -98,7 +94,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
    2) LAYOUT (core)
    ================================ */
 .container {
-  max-width: 960px;
+  max-width: 1400px;
   margin: var(--sp-10) auto;
   padding: 0 var(--sp-4);
 }
@@ -108,7 +104,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 .mainLayout { display: flex; min-height: 100vh; }
 .leftColumn { flex: 1; padding: var(--sp-10) var(--sp-8); overflow-y: auto; }
 .receiptColumn {
-  width: 360px; background: var(--surface); color: var(--fg);
+  width: 420px; background: var(--surface); color: var(--fg);
   border-left: 1px solid var(--border); padding: var(--sp-6);
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
   box-shadow: -6px 0 16px rgba(0,0,0,.12);

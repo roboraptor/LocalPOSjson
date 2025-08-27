@@ -3,78 +3,106 @@
     "id": 1,
     "name": "Kofola",
     "price": 40,
-    "category": "Nápoje"
+    "category": "Nápoje",
+    "position": 2
+  },
+  {
+    "id": 18,
+    "name": "pívo",
+    "price": 10,
+    "category": "Nápoje",
+    "icon": "FaBeer",
+    "position": 3
   },
   {
     "id": 2,
-    "name": "exPresso",
+    "name": "Espresso",
     "price": 40,
-    "category": "Nápoje"
+    "category": "Nápoje",
+    "position": 4
   },
   {
     "id": 3,
     "name": "Laté",
     "price": 60,
-    "category": "Nápoje"
+    "category": "Nápoje",
+    "position": 5
   },
   {
     "id": 4,
     "name": "Dort",
     "price": 80,
-    "category": "Jídlo"
+    "category": "Jídlo",
+    "position": 6
   },
   {
     "id": 5,
     "name": "Brownie",
     "price": 55,
-    "category": "Jídlo"
+    "category": "Jídlo",
+    "position": 7
   },
   {
     "id": 6,
     "name": "Klobása",
     "price": 80,
-    "category": "Jídlo"
+    "category": "Jídlo",
+    "position": 8
   },
   {
     "id": 7,
     "name": "Kuřecí Steak",
     "price": 100,
-    "category": "Jídlo"
+    "category": "Jídlo",
+    "position": 9
   },
   {
     "id": 8,
     "name": "Pivo",
     "price": 45,
-    "category": "Nápoje"
+    "category": "Nápoje",
+    "position": 10
   },
   {
     "id": 9,
     "name": "Monster",
     "price": 50,
-    "category": "Nápoje"
+    "category": "Nápoje",
+    "position": 11
   },
   {
     "id": 12,
     "name": "Frisco",
     "price": 40,
-    "category": "Nápoje"
+    "category": "Nápoje",
+    "position": 12
   },
   {
     "id": 13,
     "name": "Agrezz",
     "price": 50,
-    "category": "Ostatní"
+    "category": "Ostatní",
+    "position": 13
   },
   {
     "id": 14,
     "name": "Birell",
     "price": 40,
-    "category": "Ostatní"
+    "category": "Ostatní",
+    "position": 14
   },
   {
     "id": 15,
     "name": "Cappuccino",
     "price": 50,
-    "category": "Nápoje"
+    "category": "Nápoje",
+    "position": 15
+  },
+  {
+    "id": 16,
+    "name": "Načůrat",
+    "price": 20,
+    "category": "Nápoje",
+    "position": 16
   }
 ]

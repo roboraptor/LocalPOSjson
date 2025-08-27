@@ -120,11 +120,19 @@ export default function Home() {
                   <div className="buttons">
                     {items.map(item => (
                       <button
+                        className="btn-items btn-success"
                         key={item.id ?? `${item.name}-${item.price}`}
-                        className="btn btn-success"
                         onClick={() => addItem(item)}
                       >
-                        {item.name}<br />{czk.format(item.price)}
+                        <div class="btn-items__top">
+                          <div class="btn-items__title">{item.name}</div>
+                        </div>
+                        <div class="btn-items__icon">🍔</div>
+                        <div class="btn-items__bottom">
+                          {/*<span class="btn-items__badge">NOVÉ</span>*/}
+                          <span class="btn-items__price">{czk.format(item.price)}</span>
+                        </div>
+                        <br />
                       </button>
                     ))}
                   </div>

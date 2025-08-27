@@ -1,67 +1,219 @@
-/* ================================
-   pos.css (POS specifické styly)
-   - grid katalogu položek
-   - tlačítka .btn-items a jejich varianty
-   ================================ */
+/* ==================================================================
+   pos.css (POS specifické styly) — KOMENTOVANÁ VERZE
+   ------------------------------------------------------------------
+   Tento soubor styluje katalog položek (grid dlaždic) a samotná
+   tlačítka/dlaždice (.btn-items) v POS aplikaci.
 
-/* Grid pro katalog (legacy .buttons + novější .btn-grid) */
+   Použité CSS custom properties (proměnné) — očekáváme je v :root/globals:
+   - --item-min:   minimální šířka jedné dlaždice (grid column minmax)
+   - --item-row:   pevná výška řádku/dlaždice (grid-auto-rows)
+   - --sp-4:       mezery/gap (napojené na spacing škálu projektu)
+   - --item-pad:   vnitřní odsazení obsahu tlačítka (padding)
+   - --item-icon:  velikost čtverce pro ikonu (šířka i výška)
+   - --radius-sm:  poloměr zaoblení rohů dlaždice
+   - --tabular:    hodnota pro font-variant-numeric (např. 'tabular-nums')
+
+   Tip: grid-auto-rows + min-height na .btn-items zajišťují konzistentní
+   výšku dlaždic bez ohledu na délku názvu. 
+   ================================================================== */
+:root {
+      /* POS rozměry (jen pro katalog tlačítek) */
+  --item-min: 140px;     /* min. šířka dlaždice */
+  --item-row: 92px;      /* výška řádku gridu => stejné výšky */
+  --item-pad: 12px;      /* vnitřní odsazení tlačítka */
+  --item-icon: 26px;     /* velikost ikony */
+  --item-font: clamp(0.95rem, 1.8vw, 1.1rem);  /* základ pro text na tlačítku */
+}
+/* ================================
+   Grid pro katalog (legacy .buttons + novější .btn-grid)
+   - Používáme CSS Grid s auto-fill a minmax(), takže se počet sloupců
+     fluidně mění podle šířky kontejneru.
+   - grid-auto-rows napojíme na --item-row → všechny dlaždice mají
+     stejnou výšku (viz také min-height na .btn-items).
+   ================================ */
 .buttons,
 .btn-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--item-min), 1fr));
-  grid-auto-rows: var(--item-row);
-  gap: var(--sp-4);
-  align-items: stretch;
-  max-width: 100%;
+  display: grid; /* grid je ideální pro dlaždice s rovnoměrnými mezerami */
+  grid-template-columns: repeat(auto-fill, minmax(var(--item-min), 1fr)); /* kolik se vejde, min šířka = --item-min */
+  grid-auto-rows: var(--item-row); /* jednotná výška „řádku“ pro konzistentní mřížku */
+  gap: var(--sp-2); /* mezery mezi dlaždicemi ze spacing škály */
+  align-items: stretch; /* dlaždice se vertikálně roztáhnou na plnou výšku řádku */
+  max-width: 100%; /* ochrana proti přetečení v rodiči */
 }
 
-/* Breakpointy – menší dlaždice na mobilech */
+/* ================================
+   Breakpointy – menší dlaždice na mobilech
+   - Na úzkých displejích zmenšíme minimální šířku a výšku, aby se
+     vešlo víc tlačítek do řádku a zachovala se ergonomie.
+   ================================ */
 @media (max-width: 720px) {
   :root {
-    --item-min: 100px;
-    --item-row: 104px;
+    --item-min: 90px; /* užší minimum = více sloupců na malém displeji */
+    --item-row: 50px; /* o něco nižší řádek, ale stále touch‑friendly (≥48px) */
   }
 }
 
-/* Katalogové tlačítko (touch-friendly, 2 řádky) */
+/* ================================
+   Katalogové tlačítko (touch-friendly, 2 řádky)
+   - Dvě řádky: nahoře ikona + název, dole badge + cena.
+   - Vypínáme interakční transformace (záměrně „stabilní“ UI bez poskakování).
+   ================================ */
 .btn-items {
-  transition: none; transform: none; /* žádné on-click efekty */
-  display: grid; grid-template-rows: 1fr auto; gap: 6px;
-  align-items: center; justify-items: start;
-  width: 100%; min-height: var(--item-row);
-  padding: var(--item-pad) var(--sp-4);
-  text-align: left; white-space: normal; overflow-wrap: anywhere;
-  border-radius: var(--radius-sm);
+  transition: none; transform: none; /* žádné on-click/hover efekty, stabilní rozvrh */
+  display: grid; grid-template-rows: 1fr auto; gap: 6px; /* 1) obsah, 2) spodní lišta */
+  align-items: center; justify-items: start; /* zarovnání obsahu v gridu */
+  width: 100%; min-height: var(--item-row); /* ladí s grid-auto-rows → stejná výška */
+  padding: var(--item-pad) var(--sp-4); /* svislé + vodorovné odsazení obsahu */
+  text-align: left; white-space: normal; overflow-wrap: anywhere; /* názvy se lámou, nic nepřetéká */
+  font-size: var(--item-font); /* nastav základní velikost pro celé tlačítko */
+  border-radius: var(--radius-sm); /* vizuální styl rohy dle design systému */
 }
-.btn-items:hover, .btn-items:active { filter: none; transform: none; }
 
-/* Vnitřek: ikona + název */
+.btn-items:hover,
+.btn-items:active { filter: none; transform: none; } /* zůstaň konzistentní, bez vizuálního skákání */
+
+/* ================================
+   Vnitřek: horní řádek = ikona + název
+   - Ikonový sloupec je pevný čtverec (var(--item-icon)), vedle něj
+     text, který se po dvou řádcích ořízne.
+   ================================ */
 .btn-items__top {
   display: grid; grid-template-columns: var(--item-icon) 1fr; gap: 10px; width: 100%;
 }
 .btn-items__icon {
-  width: var(--item-icon); height: var(--item-icon);
-  display: grid; place-items: center;
-  border-radius: 8px;
-  background: rgba(255,255,255,.08);
+  width: var(--item-icon); height: var(--item-icon); /* čtverec na ikonu */
+  display: grid; place-items: center; /* vycentrovaný piktogram uvnitř */
+  border-radius: 8px; /* jemně zaoblené pozadí ikony */
+  background: rgba(255, 255, 255, .08); /* diskrétní podklad, lépe čte hierarchii */
 }
 .btn-items__title {
-  font-weight: 600; line-height: 1.2;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font-weight: 600; line-height: 1.2; /* výraznější titulek položky */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; /* omez na 2 řádky, zbytek skryj */
 }
 
-/* Spodní řádek: badge vlevo, cena vpravo */
+/* ================================
+   Spodní řádek: badge vlevo, cena vpravo
+   - Flex rozloží obsah do dvou stran (space-between). Tabulkové číslice
+     udržují stabilní šířku ceny při změnách hodnot.
+   ================================ */
 .btn-items__bottom {
   display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;
-  font-variant-numeric: var(--tabular);
+  font-variant-numeric: var(--tabular); /* např. 'tabular-nums' – ceny méně „skáčou“ */
 }
 .btn-items__badge {
-  font-size: 12px; padding: 2px 6px; border-radius: 999px; border: 1px dashed var(--border); opacity: .75;
+  font-size: 12px; padding: 2px 6px; border-radius: 999px; /* pilulkový štítek */
+  border: 1px dashed var(--border); opacity: .75; /* decentní kontura, nižší dominance */
 }
-.btn-items__price { font-weight: 700; }
+.btn-items__price { font-weight: 700; } /* cena má vizuální prioritu */
 
-/* Větší varianta dlaždice */
+/* ================================
+   Větší varianta dlaždice
+   - Přepsání proměnných pro mírně vyšší dlaždici a větší ikonu.
+   - Užitečné na tabletech/kiosku, kde je víc prostoru.
+   ================================ */
 .btn-items--lg {
-  --item-row: 112px;
-  --item-icon: 28px;
+  --item-row: 112px; /* vyšší řádek/dlaždice */
+  --item-icon: 28px; /* větší ikona pro lepší čitelnost */
 }
+
+/* ==================================================================
+   Poznámky k přístupnosti a použitelnosti (FYI):
+   - Dbej na kontrast textu vůči pozadí (WCAG AA). 
+   - Zvaž :focus-visible styly pro klávesovou navigaci (nepřidáno zde,
+     typicky v core/globals). 
+   - Minimální „touch target“ by měl být cca 44–48 px; tady to
+     zajišťuje --item-row a padding. 
+   - Dlouhé názvy se zalamují (overflow-wrap:anywhere), čímž předcházíme
+     layout shiftu a přetékání.
+   ================================================================== */
+
+   /* === POS typografie dlaždic – jemné ladění textu ================== */
+
+/* 1) Proměnné pro text (můžeš přepsat i lokálně na .buttons/.btn-grid) */
+:root {
+  --item-title-font: clamp(1rem, 2.1vw, 1.25rem);   /* název položky */
+  --item-title-weight: 600;
+  --item-title-lines: 2;                            /* 2–3 řádky */
+  --item-title-tracking: 0;                         /* letter-spacing */
+
+  --item-price-font: clamp(1.05rem, 2.4vw, 1.3rem); /* cena */
+  --item-price-weight: 700;
+  --item-price-tracking: 0;
+
+  --item-text-align: left;                          /* left|center|right */
+}
+
+/* 2) Základ: zarovnání a velikost */
+.btn-items {
+  text-align: var(--item-text-align);
+  font-size: var(--item-font); /* už máš výše; nechávám pro jistotu */
+}
+
+/* 3) Titulek – víc kontroly: velikost, váha, řádkování, ořez */
+.btn-items__title {
+  font-size: var(--item-title-font);
+  font-weight: var(--item-title-weight);
+  letter-spacing: var(--item-title-tracking);
+  line-height: 1.25;
+
+  /* Multiline clamp (WebKit) */
+  display: -webkit-box;
+  -webkit-line-clamp: var(--item-title-lines);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  /* Fallback pro prohlížeče bez -webkit-line-clamp */
+  /* (počítá “max-height” podle počtu řádků) */
+  max-height: calc(1.25em * var(--item-title-lines));
+}
+
+/* 4) Cena – jasněji viditelná, tabulkové číslice, zarovnání doprava */
+.btn-items__bottom {
+  font-variant-numeric: var(--tabular);
+}
+.btn-items__price {
+  font-size: var(--item-price-font);
+  font-weight: var(--item-price-weight);
+  letter-spacing: var(--item-price-tracking);
+  line-height: 1.15;
+  white-space: nowrap;            /* cena zůstane na jednom řádku */
+  margin-left: auto;              /* i když je text-align:center, drž vpravo */
+}
+
+/* 5) Varianty podle potřeby --------------------------------------- */
+
+/* Kompaktnější dlaždice (míň řádků názvu, menší text) */
+.btn-items.compact,
+.buttons.compact .btn-items {
+  --item-title-font: clamp(0.95rem, 2vw, 1.1rem);
+  --item-title-lines: 2;
+  --item-price-font: clamp(1rem, 2.2vw, 1.2rem);
+}
+
+/* Čitelnost/centrování (např. pro kratší názvy bez ikony) */
+.btn-items.center,
+.buttons.center .btn-items {
+  --item-text-align: center;
+}
+.btn-items.center .btn-items__top {
+  grid-template-columns: 1fr;     /* ikonu vypni nebo dej nad titulek */
+}
+.btn-items.center .btn-items__icon {
+  margin-inline: auto;
+}
+
+/* Větší důraz na název (delší názvy, 3 řádky) */
+.btn-items.emphasis,
+.buttons.emphasis .btn-items {
+  --item-title-font: clamp(1.05rem, 2.4vw, 1.35rem);
+  --item-title-lines: 3;
+}
+
+/* Jemnější badge (ať neruší text) */
+.btn-items__badge {
+  opacity: .7;
+}
+
+/* 6) Volitelné – lepší čitelnost na tmavém pozadí */
+.btn-items__title { color: inherit; }               /* nebo třeba #fff */
+.btn-items__price { color: inherit; }               /* nebo např. #ffd54f */
