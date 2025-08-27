@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import * as Fa from 'react-icons/fa';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
@@ -99,6 +100,7 @@ export default function Home() {
   };
 
   const total = receipt.reduce((sum, item) => sum + (item.price || 0), 0);
+  
 
   return (
     <div className="mainLayout">
@@ -121,18 +123,26 @@ export default function Home() {
                     {items.map(item => (
                       <button
                         className="btn-items btn-success"
-                        key={item.id ?? `${item.name}-${item.price}`}
+                        key={item.id ?? `${item.name}-${item.price}-${item.icon}`}
                         onClick={() => addItem(item)}
                       >
-                        <div class="btn-items__top">
-                          <div class="btn-items__title">{item.name}</div>
-                        </div>
-                        <div class="btn-items__icon">🍔</div>
-                        <div class="btn-items__bottom">
-                          {/*<span class="btn-items__badge">NOVÉ</span>*/}
-                          <span class="btn-items__price">{czk.format(item.price)}</span>
-                        </div>
-                        <br />
+                        {(() => {
+                        const Icon = (item.icon && Fa[item.icon]) ? Fa[item.icon] : Fa.FaUtensils;
+                          return (
+                            <>
+                              <div class="btn-items__top">
+                                <div class="btn-items__title">{item.name}</div>
+                              </div>
+                              <div class="btn-items__icon">
+                                <Icon />
+                              </div>
+                              <div class="btn-items__bottom">
+                                {/*<span class="btn-items__badge">NOVÉ</span>*/}
+                                <span class="btn-items__price">{czk.format(item.price)}</span>
+                              </div>
+                            </>
+                          );
+                        })()}
                       </button>
                     ))}
                   </div>

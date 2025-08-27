@@ -96,17 +96,6 @@ export default function ItemsAdmin() {
 
       {err && <div className="alert alert-error">{err}</div>}
 
-      {/* Filtr kategorií */}
-      <div className="card cardPad" style={{ marginBottom: 16 }}>
-        <div className="formRow">
-          <label className="label" htmlFor="filter">Filtrovat dle kategorie</label>
-          <select id="filter" className="input" value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option value="">Vše</option>
-            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-      </div>
-
       {loading ? (
         <>
           <div className="card skeleton"></div>
