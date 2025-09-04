@@ -19,9 +19,10 @@ Jednoduchá pokladní aplikace postavená na **Next.js** + **React**, která ukl
 
 - `/pages/index.js` – hlavní stránka pokladny
 - `/pages/items.js` – správa položek
-- `/pages/receipts.js` – přehled účtenek
+- `/pages/receipts.js` – přehled účtenek (vygeneruje se po uložení první účtenky)
 - `/pages/api/*` – API pro ukládání/správu dat
 - `/data/items.json` – definice položek
+- `/data/example_items.json` - Vzorové položky
 - `/data/receipts.json` – uložené účtenky
 - `/components/Header.js` – navigace
 - `/styles/globals.css` – globální styly
@@ -49,11 +50,14 @@ Aplikace poběží na [http://localhost:3000](http://localhost:3000).
   - Seřadit od nejnovější nahoře
   - Přidat filtrování
 - Rozdělení účtenek na zaplacené vs. otevřené
-- Nahradit alert("účtenka uložena") za modal okno s timeoutem 5s a tlačítkem „Přeskočit“
 - Opravit přidání vlastní položky, aby mohla být i sleva (negativní hodnota)
 - V poli „Cena“ zakázat zadávání jiných znaků než číslo a mínus
 - Doplnit možnost vlastních kategorií
 - Heartbeat do headeru jestli je server alive
+
+### ✅ Done
+
+- Nahradit alert("účtenka uložena") za modal okno s timeoutem 5s a tlačítkem „Přeskočit“
 
 ---
 
