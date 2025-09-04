@@ -46,9 +46,6 @@ Aplikace poběží na [http://localhost:3000](http://localhost:3000).
 
 - Možnost zakládat otevřené účty (platba později)
 - Logovat způsob platby (hotově, QR, kartou)
-- Upravit stránku účtenek:
-  - Seřadit od nejnovější nahoře
-  - Přidat filtrování
 - Rozdělení účtenek na zaplacené vs. otevřené
 - Opravit přidání vlastní položky, aby mohla být i sleva (negativní hodnota)
 - V poli „Cena“ zakázat zadávání jiných znaků než číslo a mínus
@@ -58,7 +55,10 @@ Aplikace poběží na [http://localhost:3000](http://localhost:3000).
 ### ✅ Done
 
 - Nahradit alert("účtenka uložena") za modal okno s timeoutem 5s a tlačítkem „Přeskočit“
-
+- Upravit stránku účtenek:
+  - Seřadit od nejnovější nahoře
+  - Přidat filtrování (Receipts V2)
+  
 ---
 
 ## 📜 Licence
