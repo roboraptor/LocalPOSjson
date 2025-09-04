@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
@@ -13,7 +14,8 @@ export default function ReceiptsPage() {
         const res = await fetch('/api/getReceipts', { cache: 'no-store' });
         if (!res.ok) throw new Error('Nepodařilo se načíst účtenky');
         const data = await res.json();
-        setReceipts(Array.isArray(data) ? data : []);
+
+        setReceipts(Array.isArray(data) ? data.slice().reverse() : []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -43,7 +45,13 @@ export default function ReceiptsPage() {
 
   return (
     <div className="container">
-      <h1 className="pageTitle">Uložené účtenky</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h1 className="pageTitle">Uložené účtenky</h1>
+        <Link href="/receipts2">
+          <button className="btn btn-warning">V2</button>
+        </Link>
+      </div>
+      
       {receipts.length === 0 ? (
         <p className="muted">Žádné uložené účtenky.</p>
       ) : (
