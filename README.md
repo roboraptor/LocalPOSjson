@@ -30,6 +30,8 @@ Jednoduchá pokladní aplikace postavená na **Next.js** + **React**, která ukl
 
 ## 🚀 Spuštění projektu
 
+- Pokud chceš mít v pokladně předpřipravené položky, přejmenuj soubor `data/example_items.json` na `data/items.json`.
+- Nainstaluj závislosti a spusť:
 ```bash
 npm install
 npm run dev
