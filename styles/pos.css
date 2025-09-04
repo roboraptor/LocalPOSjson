@@ -191,19 +191,19 @@
 .btn-items--tri .btn-items__title {
   position: absolute;
   top: var(--item-pad);
-  left: var(--sp-4);
-  right: calc(var(--sp-4) + 56px);               /* aby text nezajel pod ikonu */
+  left: var(--sp-2);
   /* V tri-layoutu většinou 1–2 řádky: můžeš přepnout na nowrap podle potřeby */
   white-space: nowrap;
   overflow: visible;
   text-overflow: ellipsis;
+  text-align: left;                             
 }
 
 /* Cena – levý dolní roh */
 .btn-items--tri .btn-items__price {
   position: absolute;
   bottom: var(--item-pad);
-  left: var(--sp-4);
+  left: var(--sp-2);
   margin-left: 0;                                 /* přepíšeme default (vpravo) */
 }
 

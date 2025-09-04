@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Modal from '../components/Modal';
 import * as Fa from 'react-icons/fa6';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
@@ -25,7 +26,6 @@ export default function Home() {
       }
     })();
 
-    // cleanup auto-hide timeru modalu při unmountu
     return () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     };
@@ -37,31 +37,32 @@ export default function Home() {
     items: menuItems.filter(i => (i.category || 'Ostatní') === cat)
   }));
 
-  // --- vlastní položka ---
-  const [showCustom, setShowCustom] = useState(false);
+  // --- MODAL: vlastní položka ---
+  const [showCustomModal, setShowCustomModal] = useState(false);
   const [customName, setCustomName] = useState('');
-  const [customPrice, setCustomPrice] = useState('');
+  const [customPrice, setCustomPrice] = useState(''); // string -> převedeme až při uložení
 
-  // --- jméno na účtenku (staff / zákazník) ---
-  const [showNameForm, setShowNameForm] = useState(false);
+  // --- MODAL: jméno na účtenku (staff / zákazník) ---
+  const [showNameModal, setShowNameModal] = useState(false);
   const [issuedTo, setIssuedTo] = useState(''); // uložíme do /api/save
   const [isStaff, setIsStaff] = useState(false);
-
-  // ref na input
-  const issuedToRef = useRef(null);
 
   const addItem = (item) => setReceipt((r) => [...r, item]);
   const clearReceipt = () => setReceipt([]);
 
   const addCustomItem = () => {
     const name = customName.trim();
-    const priceNum = customPrice === '' ? 0 : Number(customPrice);
+    // povolíme čísla + mínus; tečky/čárky převedeme na tečku a pak na číslo
+    const normalized = String(customPrice).replace(',', '.').trim();
+    const priceNum = normalized === '' ? NaN : Number(normalized);
+
     if (!name) { alert('Zadej název položky.'); return; }
-    if (!Number.isFinite(priceNum) || priceNum < 0) { alert('Cena musí být nezáporné číslo.'); return; }
+    if (!Number.isFinite(priceNum)) { alert('Cena musí být číslo (povoleno i záporné).'); return; }
+
     addItem({ name, price: priceNum });
     setCustomName('');
     setCustomPrice('');
-    setShowCustom(false);
+    setShowCustomModal(false);
   };
 
   // --- modal helpery ---
@@ -89,7 +90,7 @@ export default function Home() {
       });
       if (!res.ok) throw new Error('Chyba při ukládání.');
 
-      // ✅ vyčisti hned a ukaž modal (bez blokujícího alertu)
+      // ✅ vyčisti hned a ukaž modal
       clearReceipt();
       setIssuedTo('');
       setIsStaff(false);
@@ -100,11 +101,10 @@ export default function Home() {
   };
 
   const total = receipt.reduce((sum, item) => sum + (item.price || 0), 0);
-  
 
   return (
     <div className="mainLayout">
-      {/* Levý sloupec – nabídka + vlastní položka + na jméno + akce */}
+      {/* Levý sloupec – nabídka + akce */}
       <div className="leftColumn">
         <div className="container" style={{ margin: 0, padding: 0 }}>
 
@@ -117,7 +117,7 @@ export default function Home() {
           ) : (
             grouped.map(({ cat, items }) => (
               items.length > 0 && (
-                <section key={cat} style={{ marginBottom: 16 }}>
+                <section key={cat} style={{ marginBottom: 10 }}>
                   <h2 className="sectionTitle">{cat}</h2>
                   <div className="buttons">
                     {items.map(item => (
@@ -127,23 +127,20 @@ export default function Home() {
                         onClick={() => addItem(item)}
                       >
                         {(() => {
-                        const Icon = (item.icon && Fa[item.icon]) ? Fa[item.icon] : Fa.FaUtensils;
+                          const Icon = (item.icon && Fa[item.icon]) ? Fa[item.icon] : Fa.FaUtensils;
                           return (
                             <>
-                             
-                              <div class="btn-items__title">
+                              <div className="btn-items__title">
                                 {item.name}
                               </div>
-                              
-                              <div class="btn-items__icon">
+
+                              <div className="btn-items__icon">
                                 <Icon />
                               </div>
-                              
-                                
-                              <div class="btn-items__price">
+
+                              <div className="btn-items__price">
                                 {czk.format(item.price)}
                               </div>
-                              
                             </>
                           );
                         })()}
@@ -155,122 +152,87 @@ export default function Home() {
             ))
           )}
 
-          {/* 2) karta: vlastní položka + na jméno */}
+          {/* 2) karta: Možnosti (už jen tlačítka, formuláře jsou v modalech) */}
           <h2 className="sectionTitle">Možnosti</h2>
-          <div className="card cardPad" style={{ marginTop: 16 }}>
-            {/* a) Přidat vlastní položku */}
-            {!showCustom ? (
-              <button className="btn btn-warning" onClick={() => setShowCustom(true)}>
-                + Přidat vlastní položku
-              </button>
-            ) : (
-              <div style={{ marginBottom: 12 }}>
-                <div className="formRow">
-                  <label className="label" htmlFor="customName">Název</label>
-                  <input
-                    id="customName"
-                    className="input"
-                    type="text"
-                    placeholder="Např. Sleva / Zboží mimo nabídku"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                  />
-                </div>
-                <div className="formRow">
-                  <label className="label" htmlFor="customPrice">Cena (Kč)</label>
-                  <input
-                    id="customPrice"
-                    className="input"
-                    type="number"
-                    inputMode="decimal"
-                    placeholder="0"
-                    value={customPrice}
-                    onChange={(e) => setCustomPrice(e.target.value)}
-                  />
-                </div>
-                <div className="grid">
-                  <button className="btn btn-primary" onClick={addCustomItem}>
-                    Přidat do účtenky
-                  </button>
-                  <button
-                    className="btn btn-ghost"
-                    onClick={() => { setShowCustom(false); setCustomName(''); setCustomPrice(''); }}
-                  >
-                    Zrušit
-                  </button>
-                </div>
+          <div className="buttons " >
+            <button
+              className="btn btn-warning btn-items--tri"
+              onClick={() => setShowCustomModal(true)}
+            >
+              <div className="btn-items__title">
+                Vlastní <br /> položka
               </div>
-            )}
-
-            {/* b) Na jméno (staff / zákazník) */}
-            {!showNameForm ? (
-              <button
-                className="btn btn-warning"
-                onClick={() => {
-                  setShowNameForm(true);
-                  setIsStaff(true); // automaticky nastaví Staff = true
-                  setTimeout(() => { issuedToRef.current?.focus(); }, 0);
-                }}
-              >
-                + Na jméno
-              </button>
-            ) : (
-              <div>
-                <div className="formRow">
-                  <label className="label" htmlFor="issuedTo">Jméno / identifikátor</label>
-                  <input
-                    ref={issuedToRef}
-                    id="issuedTo"
-                    className="input"
-                    type="text"
-                    placeholder="Např. Jana Nováková / ID: 123"
-                    value={issuedTo}
-                    onChange={(e) => setIssuedTo(e.target.value)}
-                  />
-                </div>
-                <div className="formRow" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    id="isStaff"
-                    type="checkbox"
-                    checked={isStaff}
-                    onChange={(e) => setIsStaff(e.target.checked)}
-                  />
-                  <label htmlFor="isStaff" className="label">Staff účet</label>
-                </div>
-                <div className="grid">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => setShowNameForm(false)}
-                    disabled={!issuedTo.trim()}
-                  >
-                    Nastavit jméno
-                  </button>
-                  <button
-                    className="btn btn-ghost"
-                    onClick={() => {
-                      setIssuedTo('');
-                      setShowNameForm(false);
-                      setIsStaff(false);
-                    }}
-                  >
-                    Zrušit
-                  </button>
-                </div>
+              <div className="btn-items__icon">
+                <Fa.FaRegSquarePlus />
               </div>
-            )}
+            </button>
 
-            {/* aktuálně nastavené jméno */}
+            <button
+              className="btn btn-warning btn-items--tri"
+              onClick={() => {
+                setIsStaff(true); // výchozí „Staff účet“ = zapnuto (můžeš vypnout v modalu)
+                setShowNameModal(true);
+              }}
+            >
+              <div className="btn-items__title">
+                Na účet
+              </div>
+              {issuedTo?.trim() ? (
+                <p className="muted" style={{ marginTop: 30 }}>
+                {issuedTo}
+                
+                <br /> Staff: <strong>{isStaff ? 'Ano' : 'Ne'}</strong></p>
+              ) : null}
+
+              {isStaff ? (
+                <div className="btn-items__icon">
+                  <Fa.FaUserTie />
+               </div>
+              ) : (
+                <div className="btn-items__icon">
+                  <Fa.FaUser />
+               </div>
+              )}
+
+              
+              
+            </button>
+
+            {/* aktuálně nastavené jméno 
             {issuedTo?.trim() ? (
+              <button
+              className="btn btn-warning btn-items--tri">
+
               <p className="muted" style={{ marginTop: 8 }}>
                 Aktuálně nastaveno: <strong>{issuedTo}</strong>
-                {' '}• Staff: <strong>{isStaff ? 'Ano' : 'Ne'}</strong>
+                <br /> Staff: <strong>{isStaff ? 'Ano' : 'Ne'}</strong>
               </p>
+              </button>
             ) : null}
+            */}
+
+
+            <button
+              className="btn btn-warning btn-items--tri"
+              onClick={() => {
+                setIsStaff(true); // výchozí „Staff účet“ = zapnuto (můžeš vypnout v modalu)
+                setShowNameModal(true);
+              }}
+            >
+              <div className="btn-items__title">
+                Na stůl
+              </div>
+              <div className="btn-items__icon">
+                <Fa.FaMapPin />
+              </div>
+            </button>
+
+            
           </div>
 
           {/* 3) akční tlačítka */}
           <h2 className="sectionTitle">Akce</h2>
-          <div className="grid" style={{ marginTop: 16 }}>
+          <div className="grid" style={{ marginTop: 10 }}>
             <button className="btn btn-primary" onClick={saveReceipt} disabled={receipt.length === 0}>
               Uložit účtenku
             </button>
@@ -323,7 +285,7 @@ export default function Home() {
         )}
       </aside>
 
-      {/* ✅ neblokující potvrzovací modal */}
+      {/* ✅ potvrzovací modal po uložení */}
       {savedModalOpen && (
         <div className="modalOverlay" role="status" aria-live="polite">
           <div className="modalCard">
@@ -336,6 +298,84 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* 🔶 Modal: Vlastní položka */}
+      <Modal open={showCustomModal} onClose={() => setShowCustomModal(false)} title="Přidat vlastní položku">
+        <div className="formRow">
+          <label className="label" htmlFor="customName">Název</label>
+          <input
+            id="customName"
+            className="input"
+            type="text"
+            placeholder="Např. Sleva / Zboží mimo nabídku"
+            value={customName}
+            onChange={(e) => setCustomName(e.target.value)}
+            autoFocus
+          />
+        </div>
+        <div className="formRow">
+          <label className="label" htmlFor="customPrice">Cena (Kč)</label>
+          <input
+            id="customPrice"
+            className="input"
+            type="text"
+            inputMode="numeric"
+            pattern="-?[0-9]*([.,][0-9]+)?"
+            placeholder="např. 0 nebo -20"
+            title="Povoleno je číslo, případně se znakem mínus pro slevu"
+            value={customPrice}
+            onChange={(e) => setCustomPrice(e.target.value)}
+          />
+        </div>
+        <div className="modalActions" style={{ gap: 8 }}>
+          <button className="btn btn-success" onClick={addCustomItem}>Přidat</button>
+          <button className="btn btn-ghost" onClick={() => { setShowCustomModal(false); setCustomName(''); setCustomPrice(''); }}>Zrušit</button>
+        </div>
+      </Modal>
+
+      {/* 🔷 Modal: Na jméno */}
+      <Modal open={showNameModal} onClose={() => setShowNameModal(false)} title="Zadat jméno zákazníka">
+        <div className="formRow">
+          <label className="label" htmlFor="issuedTo">Jméno / identifikátor</label>
+          <input
+            id="issuedTo"
+            className="input"
+            type="text"
+            placeholder="Např. Jana Nováková / ID: 123"
+            value={issuedTo}
+            onChange={(e) => setIssuedTo(e.target.value)}
+            autoFocus
+          />
+        </div>
+        <div className="formRow" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            id="isStaff"
+            type="checkbox"
+            checked={isStaff}
+            onChange={(e) => setIsStaff(e.target.checked)}
+          />
+          <label htmlFor="isStaff" className="label">Staff účet</label>
+        </div>
+        <div className="modalActions" style={{ gap: 8 }}>
+          <button
+            className="btn btn-success"
+            onClick={() => setShowNameModal(false)}
+            disabled={!issuedTo.trim()}
+          >
+            Nastavit
+          </button>
+          <button
+            className="btn btn-ghost"
+            onClick={() => {
+              setIssuedTo('');
+              setIsStaff(false);
+              setShowNameModal(false);
+            }}
+          >
+            Zrušit
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

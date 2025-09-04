@@ -13,7 +13,7 @@
    0) CSS RESET + BASE
    ================================ */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { height: 100%; }
+html, body { height: 100%; scrollbar-gutter: stable;}
 body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
@@ -75,7 +75,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   /* Tabular nums pro ceny */
   --tabular: tabular-nums lining-nums;
 
-
+  --header-h: 62px;  /* výška headeru */
 }
 
 /* Volitelné: světlé schéma */
@@ -101,12 +101,12 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 .pageTitle { font-size: 28px; font-weight: 700; margin: var(--sp-2) 0 var(--sp-4); }
 
 /* Hlavní dvousloupcový layout pro pokladnu */
-.mainLayout { display: flex; min-height: 100vh; }
-.leftColumn { flex: 1; padding: var(--sp-10) var(--sp-8); overflow-y: auto; }
+.mainLayout { display: flex; min-height: calc(100dvh - var(--header-h));}
+.leftColumn { flex: 1; padding: var(--sp-2) var(--sp-6); overflow-y: auto; }
 .receiptColumn {
   width: 420px; background: var(--surface); color: var(--fg);
   border-left: 1px solid var(--border); padding: var(--sp-6);
-  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  position: sticky; top: 0;  overflow-y: auto;
   box-shadow: -6px 0 16px rgba(0,0,0,.12);
 }
 
@@ -163,7 +163,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 .siteHeader__link { color: var(--fg); font-weight: 500; padding: 6px 10px; border-radius: var(--radius-sm); transition: background .2s ease; }
 .siteHeader__link:hover { background: var(--surface-2); }
 .siteHeader__link.active { background: var(--primary); color: #fff; }
-.sectionTitle { font-size: 18px; font-weight: 700; margin: var(--sp-4) 0 var(--sp-2); }
+.sectionTitle { font-size: 18px; font-weight: 700; margin: var(--sp-2) 0 var(--sp-2); }
 
 /* PRINT zůstává zde, ať funguje univerzálně */
 @media print {
