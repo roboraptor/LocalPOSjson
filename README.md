@@ -19,11 +19,11 @@ Jednoduchá pokladní aplikace postavená na **Next.js** + **React**, která ukl
 
 - `/pages/index.js` – hlavní stránka pokladny
 - `/pages/items.js` – správa položek
-- `/pages/receipts.js` – přehled účtenek (vygeneruje se po uložení první účtenky)
+- `/pages/receipts.js` – přehled účtenek 
 - `/pages/api/*` – API pro ukládání/správu dat
 - `/data/items.json` – definice položek
 - `/data/example_items.json` - Vzorové položky
-- `/data/receipts.json` – uložené účtenky
+- `/data/receipts.json` – uložené účtenky (vygeneruje se po uložení první účtenky)
 - `/components/Header.js` – navigace
 - `/styles/globals.css` – globální styly
 
