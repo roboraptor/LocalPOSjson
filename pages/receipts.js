@@ -270,14 +270,17 @@ export default function ReceiptsPage() {
         </div>
       )}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-            <div></div>
-            <div >
-            <button className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} onClick={deleteAllReceipts} >
-                <Fa.FaTrashCan /> Smazat Vše
-            </button>
-            </div>
+
+
+      <div className="card cardPad" style={{ marginBottom: 16, marginTop: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <div>
         </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center' }} onClick={deleteAllReceipts} >
+            <Fa.FaTrashCan /> Smazat Vše
+          </button>
+        </div>
+      </div>
 
     </div>
   );
