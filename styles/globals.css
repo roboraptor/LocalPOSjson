@@ -118,6 +118,11 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 .grid2 { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
 @media (min-width: 950px) { .grid2 { grid-template-columns: 1fr 1fr; } }
 
+.grid-tiny { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
+@media (min-width: 560px) { .grid-tiny { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 830px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr; } }
+@media (min-width: 1100px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr 1fr; } }
+@media (min-width: 1370px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; } }
 
 /* ================================
    3) KOMPONENTY core (karty, alerty, tlačítka)
