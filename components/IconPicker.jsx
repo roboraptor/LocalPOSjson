@@ -33,7 +33,9 @@ export default function IconPicker({ value, onChange, placeholder = "Hledat ikon
         />
         <div className="ip-current">
           <span className="muted">Vybráno:</span>
-          {Selected ? <Selected size={20} /> : <span className="muted">—</span>}
+          <div style={{ width: 24, height: 24, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}> 
+          {Selected ? <Selected size={24}  /> : <span className="muted">—</span>}
+          </div>
           <code>{value || "—"}</code>
         </div>
       </div>
@@ -62,7 +64,7 @@ export default function IconPicker({ value, onChange, placeholder = "Hledat ikon
       <style jsx>{`
         .ip { display: grid; gap: .5rem; }
         .ip-head { display:flex; gap:.5rem; align-items:center; }
-        .ip-current { display:flex; align-items:center; gap:.4rem; }
+        .ip-current { display:flex; align-items:center; gap:.4rem;  }
         .ip-grid {
           display:grid; gap:.4rem;
           grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
