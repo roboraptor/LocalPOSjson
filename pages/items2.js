@@ -157,8 +157,13 @@ export default function ItemsAdmin() {
 
   return (
     <div className="container">
-      <h1 className="pageTitle">Položky menu</h1>
-      <p className="muted">Spravuj produkty dostupné v pokladně – včetně kategorie, pozice a ikony.</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center'}}>
+        <h1 className="pageTitle">Položky menu</h1>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <Link href="/" className="btn btn-warning">POS</Link>
+          <Link href="/export" className="btn btn-warning">Export</Link>
+        </div>
+      </div>
 
       {err && <div className="alert alert-error">{err}</div>}
 
@@ -184,14 +189,13 @@ export default function ItemsAdmin() {
               <button className="btn" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
                 {savingOrder ? 'Ukládám…' : '💾 Uložit pořadí'}
               </button>
-              <Link className="btn btn-ghost" href="/">← Zpět na POS</Link>
             </div>
           </div>
 
           {/* Formulář */}
           <div className="card cardPad" style={{ marginBottom: 16 }}>
             <form onSubmit={submit}>
-              <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="grid-tiny"  >
                 <div className="formRow">
                   <label className="label" htmlFor="name">Název</label>
                   <input id="name" className="input"
@@ -204,9 +208,7 @@ export default function ItemsAdmin() {
                     value={form.price}
                     onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))} />
                 </div>
-              </div>
 
-              <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="formRow">
                   <label className="label" htmlFor="category">Kategorie</label>
                   <select id="category" className="input"
@@ -221,18 +223,21 @@ export default function ItemsAdmin() {
                     value={form.position || ''}
                     onChange={(e) => setForm(f => ({ ...f, position: e.target.value }))} />
                 </div>
+                <div className="formRow">
+                  <label className="label">Ikona (FontAwesome)</label>
+                  <div style={{ gap: 8 }}>
+                    <div className="card" style={{ padding: 8, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                      <IconByName name={form.icon} size={24} />
+                      <code>{form.icon || '—'}</code>
+                    </div>
+                  </div>
+                </div>
               </div>
+
                {/* Icon Picker */}
               <div className="formRow">
                 <label className="label">Ikona (FontAwesome)</label>
                 <div className="grid" style={{ alignItems: 'start' }}>
-                  <div className="grid" style={{ gap: 8 }}>
-                    <div className="muted">Náhled</div>
-                    <div className="card" style={{ padding: 8, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                      <IconByName name={form.icon} size={22} />
-                      <code>{form.icon || '—'}</code>
-                    </div>
-                  </div>
                   <div style={{ gridColumn: '1 / -1' }}>
                     <IconPicker
                       value={form.icon}
@@ -280,12 +285,21 @@ export default function ItemsAdmin() {
                   <div className="totalPrice">{czk.format(item.price || 0)}</div>
                 </header>
                 <div className="muted">Kategorie: <strong>{item.category || 'Ostatní'}</strong></div>
-                <div className="grid" style={{ marginTop: 12 }}>
-                  <button className="btn" onClick={() => edit(item)}>Upravit</button>
-                  <button className="btn btn-danger" onClick={() => del(item.id)}>Smazat</button>
+                <div style={{ marginTop: 12, display: 'flex', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
+                  
+                  <button className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => edit(item)}><Fa.FaWrench /> Upravit</button>
+                  <button className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => del(item.id)}><Fa.FaTrashCan /> Smazat</button>
                 </div>
               </section>
             ))}
+          </div>
+
+          <div className="card cardPad" style={{ marginBottom: 16, marginTop: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+             <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
+                {savingOrder ? 'Ukládám…' : '💾 Uložit pořadí'}
+              </button>
+            </div>
           </div>
 
           <style jsx>{`
