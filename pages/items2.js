@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import * as Fa from 'react-icons/fa6';
+import Modal from '../components/Modal'; 
 import IconPicker from '../components/IconPicker';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
@@ -21,8 +22,11 @@ export default function ItemsAdmin() {
   const [filter, setFilter] = useState(''); // filtr dle kategorie
   const [dirty, setDirty] = useState(false); // NEW – změněné pořadí
   const dragIdRef = useRef(null); // NEW – id přetahované položky
+  
+  const [modalOpen, setModalOpen] = useState(false);       // modal on/off
+  const [modalMode, setModalMode] = useState('create');    // 'create' | 'edit'
 
-  const emptyForm = { id: null, name: '', price: '', category: 'Ostatní', icon: 'FaRegSquare', position: '' };
+  const emptyForm = { id: null, name: '', price: '', category: 'Ostatní', icon: 'FaCubes', position: '' };
   const [form, setForm] = useState(emptyForm);
 
   const load = async () => {
@@ -174,28 +178,11 @@ export default function ItemsAdmin() {
         </>
       ) : (
         <>
-          {/* Toolbar – NEW: filtr + uložit pořadí */}
-          <div className="card cardPad" style={{ marginBottom: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <div className="formRow">
-                <label className="label" htmlFor="filter">Filtr kategorie</label>
-                <select id="filter" className="input" value={filter} onChange={(e) => setFilter(e.target.value)}>
-                  <option value="">— vše —</option>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
-                {savingOrder ? 'Ukládám…' : '💾 Uložit pořadí'}
-              </button>
-            </div>
-          </div>
 
           {/* Formulář */}
           <div className="card cardPad" style={{ marginBottom: 16 }}>
             <form onSubmit={submit}>
-              <div className="grid-tiny"  >
+              <div className="grid-tiny">
                 <div className="formRow">
                   <label className="label" htmlFor="name">Název</label>
                   <input id="name" className="input"
@@ -262,6 +249,26 @@ export default function ItemsAdmin() {
             </form>
           </div>
 
+          {/* Toolbar – NEW: filtr + uložit pořadí */}
+          <div className="card cardPad" style={{ marginBottom: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            
+              <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                <div className="formRow">
+                    <label className="label" htmlFor="filter">Filtr kategorie</label>
+                    <select id="filter" className="input" value={filter} onChange={(e) => setFilter(e.target.value)}>
+                    <option value="">— vše —</option>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn btn-primary" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
+                    {savingOrder ? 'Ukládám…' : '💾 Uložit pořadí'}
+                </button>
+              </div>
+            
+          </div>
+
           {/* Seznam položek (DRAG & DROP) */}
           <div className="grid-tiny" onDragOver={onDragOver}>
             {items.map(item => (
@@ -295,8 +302,10 @@ export default function ItemsAdmin() {
           </div>
 
           <div className="card cardPad" style={{ marginBottom: 16, marginTop: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <div>
+            </div>
              <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
+              <button className="btn btn-primary" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
                 {savingOrder ? 'Ukládám…' : '💾 Uložit pořadí'}
               </button>
             </div>
