@@ -1,7 +1,6 @@
 // pages/items.js
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import * as Fa from 'react-icons/fa6';
 import IconPicker from '../components/IconPicker';
 
@@ -17,8 +16,11 @@ function IconByName({ name, size = 18 }) {
 export default function ItemsAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [savingOrder, setSavingOrder] = useState(false); // NEW
   const [err, setErr] = useState(null);
   const [filter, setFilter] = useState(''); // filtr dle kategorie
+  const [dirty, setDirty] = useState(false); // NEW – změněné pořadí
+  const dragIdRef = useRef(null); // NEW – id přetahované položky
 
   const emptyForm = { id: null, name: '', price: '', category: 'Ostatní', icon: 'FaRegSquare', position: '' };
   const [form, setForm] = useState(emptyForm);
@@ -29,7 +31,16 @@ export default function ItemsAdmin() {
       const url = filter ? `/api/items?category=${encodeURIComponent(filter)}` : '/api/items';
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error('Nepodařilo se načíst položky.');
-      setItems(await res.json());
+      const data = await res.json();
+
+      // NEW: doplnění/normalizace position + seřazení
+      const withPos = (Array.isArray(data) ? data : []).map((it, idx) => ({
+        ...it,
+        position: typeof it.position === 'number' ? it.position : idx + 1,
+      })).sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
+      setItems(withPos);
+      setDirty(false);
     } catch (e) { setErr(e.message); } finally { setLoading(false); }
   };
 
@@ -89,6 +100,61 @@ export default function ItemsAdmin() {
     } catch (e) { alert(e.message); }
   };
 
+  // =========================
+  // NEW: Drag & Drop handlers
+  // =========================
+  const onDragStart = (e, id) => {
+    dragIdRef.current = id;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(id)); // kvůli FF
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault(); // umožní drop
+  };
+
+  const onDrop = (e, overId) => {
+    e.preventDefault();
+    const dragId = dragIdRef.current;
+    if (!dragId || dragId === overId) return;
+
+    // přeuspořádání v rámci aktuálního seznamu items
+    const next = [...items];
+    const from = next.findIndex(i => i.id === dragId);
+    const to = next.findIndex(i => i.id === overId);
+    if (from === -1 || to === -1) return;
+
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+
+    // přepočet position 1..N (v rámci zobrazeného setu)
+    const renumbered = next.map((it, idx) => ({ ...it, position: idx + 1 }));
+    setItems(renumbered);
+    setDirty(true);
+  };
+
+  // =========================
+  // NEW: Uložení pořadí přes existující PUT /api/items (batch)
+  // =========================
+  async function saveOrder() {
+    try {
+        const payload = items.map(({ id, position }) => ({ id, position }));
+        const res = await fetch('/api/items', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: payload }),
+        cache: 'no-store',
+        });
+        if (!res.ok) throw new Error('Uložení pořadí selhalo.');
+
+        await load(); // ať si hned natáhneš normalizované pořadí ze serveru
+        alert('Pořadí uloženo.');
+    } catch (e) {
+        alert(e.message);
+    }
+  } 
+
+
   return (
     <div className="container">
       <h1 className="pageTitle">Položky menu</h1>
@@ -103,6 +169,25 @@ export default function ItemsAdmin() {
         </>
       ) : (
         <>
+          {/* Toolbar – NEW: filtr + uložit pořadí */}
+          <div className="card cardPad" style={{ marginBottom: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <div className="formRow">
+                <label className="label" htmlFor="filter">Filtr kategorie</label>
+                <select id="filter" className="input" value={filter} onChange={(e) => setFilter(e.target.value)}>
+                  <option value="">— vše —</option>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
+                {savingOrder ? 'Ukládám…' : '💾 Uložit pořadí'}
+              </button>
+              <Link className="btn btn-ghost" href="/">← Zpět na POS</Link>
+            </div>
+          </div>
+
           {/* Formulář */}
           <div className="card cardPad" style={{ marginBottom: 16 }}>
             <form onSubmit={submit}>
@@ -158,7 +243,6 @@ export default function ItemsAdmin() {
                 </div>
               </div>
 
-
               {/* Tlačítka */}
               <div className="grid" style={{ marginTop: 16 }}>
                 <button className="btn btn-primary" type="submit">
@@ -169,18 +253,26 @@ export default function ItemsAdmin() {
                     Zrušit úpravu
                   </button>
                 )}
-                
               </div>
             </form>
           </div>
 
-
-          {/* Seznam položek */}
-          <div className="grid"  >
+          {/* Seznam položek (DRAG & DROP) */}
+          <div className="grid-tiny" onDragOver={onDragOver}>
             {items.map(item => (
-              <section key={item.id} className="card cardPad">
+              <section
+                key={item.id}
+                className="card cardPad drag-card"
+                draggable // NEW
+                onDragStart={(e) => onDragStart(e, item.id)} // NEW
+                onDrop={(e) => onDrop(e, item.id)} // NEW
+              >
                 <header className="receiptHeader" style={{ padding: 0, borderBottom: 'none', alignItems: 'center' }}>
                   <div className="receiptTitle" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {/* NEW: handle */}
+                    <span className="drag-handle" title="Táhni pro změnu pořadí" style={{ cursor: 'grab', display: 'inline-flex', alignItems: 'center' }}>
+                      <Fa.FaGripLines />
+                    </span>
                     <IconByName name={item.icon} />
                     <span>#{item.position}</span>
                     <span>{item.name}</span>
@@ -195,6 +287,12 @@ export default function ItemsAdmin() {
               </section>
             ))}
           </div>
+
+          <style jsx>{`
+            .drag-card { transition: background-color .12s ease; }
+            .drag-card:active { background: rgba(0, 0, 0, 0.03); }
+            .drag-handle :global(svg) { pointer-events: none; }
+          `}</style>
         </>
       )}
     </div>

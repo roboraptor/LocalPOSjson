@@ -1,16 +1,16 @@
 [
   {
-    "id": 1,
-    "name": "Kofola",
-    "price": 40,
-    "category": "Nápoje",
-    "position": 1,
-    "icon": "FaBeerMugEmpty"
-  },
-  {
     "id": 2,
     "name": "Espresso",
     "price": 40,
+    "category": "Nápoje",
+    "position": 1,
+    "icon": "FaMugSaucer"
+  },
+  {
+    "id": 15,
+    "name": "Cappuccino",
+    "price": 50,
     "category": "Nápoje",
     "position": 2,
     "icon": "FaMugSaucer"
@@ -24,51 +24,35 @@
     "icon": "FaMugSaucer"
   },
   {
-    "id": 4,
-    "name": "Dort",
-    "price": 80,
-    "category": "Jídlo",
+    "id": 1,
+    "name": "Kofola",
+    "price": 40,
+    "category": "Nápoje",
     "position": 4,
-    "icon": "FaCheese"
-  },
-  {
-    "id": 5,
-    "name": "Brownie",
-    "price": 55,
-    "category": "Jídlo",
-    "position": 5,
-    "icon": "FaCheese"
-  },
-  {
-    "id": 6,
-    "name": "Klobása",
-    "price": 80,
-    "category": "Jídlo",
-    "position": 6,
-    "icon": "FaHotdog"
-  },
-  {
-    "id": 7,
-    "name": "Kuřecí Steak",
-    "price": 100,
-    "category": "Jídlo",
-    "position": 7,
-    "icon": "FaDrumstickBite"
+    "icon": "FaBeerMugEmpty"
   },
   {
     "id": 8,
     "name": "Pivo",
     "price": 45,
     "category": "Nápoje",
-    "position": 8,
+    "position": 5,
     "icon": "FaBeerMugEmpty"
+  },
+  {
+    "id": 14,
+    "name": "Birell",
+    "price": 40,
+    "category": "Nápoje",
+    "position": 6,
+    "icon": "FaBottleWater"
   },
   {
     "id": 9,
     "name": "Monster",
     "price": 50,
     "category": "Nápoje",
-    "position": 9,
+    "position": 7,
     "icon": "FaBottleWater"
   },
   {
@@ -76,39 +60,71 @@
     "name": "Frisco",
     "price": 40,
     "category": "Nápoje",
+    "position": 8,
+    "icon": "FaBottleWater"
+  },
+  {
+    "id": 4,
+    "name": "Dort",
+    "price": 80,
+    "category": "Jídlo",
+    "position": 9,
+    "icon": "FaCheese"
+  },
+  {
+    "id": 5,
+    "name": "Brownie",
+    "price": 55,
+    "category": "Jídlo",
     "position": 10,
-    "icon": "FaBottleWater"
+    "icon": "FaCheese"
   },
   {
-    "id": 13,
-    "name": "Agrezz",
-    "price": 50,
-    "category": "Ostatní",
-    "position": 11,
-    "icon": "FaCubes"
+    "id": 19,
+    "name": "Burger",
+    "price": 120,
+    "category": "Jídlo",
+    "icon": "FaBurger",
+    "position": 11
   },
   {
-    "id": 14,
-    "name": "Birell",
-    "price": 40,
-    "category": "Nápoje",
-    "position": 12,
-    "icon": "FaBottleWater"
+    "id": 18,
+    "name": "HotDog",
+    "price": 80,
+    "category": "Jídlo",
+    "icon": "FaDog",
+    "position": 12
   },
   {
-    "id": 15,
-    "name": "Cappuccino",
-    "price": 50,
-    "category": "Nápoje",
+    "id": 6,
+    "name": "Klobása",
+    "price": 80,
+    "category": "Jídlo",
     "position": 13,
-    "icon": "FaMugSaucer"
+    "icon": "FaHotdog"
+  },
+  {
+    "id": 7,
+    "name": "Kuřecí Steak",
+    "price": 100,
+    "category": "Jídlo",
+    "position": 14,
+    "icon": "FaDrumstickBite"
   },
   {
     "id": 16,
-    "name": "Načůrat",
-    "price": 20,
-    "category": "Nápoje",
-    "position": 14,
-    "icon": "FaGlassWaterDroplet"
+    "name": "Tričko",
+    "price": 400,
+    "category": "Ostatní",
+    "icon": "FaShirt",
+    "position": 15
+  },
+  {
+    "id": 17,
+    "name": "Náramek",
+    "price": 70,
+    "category": "Ostatní",
+    "icon": "FaRing",
+    "position": 16
   }
 ]

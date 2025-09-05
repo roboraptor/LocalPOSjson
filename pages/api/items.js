@@ -178,6 +178,30 @@ export default function handler(req, res) {
       return res.status(200).json(saved);
     }
 
+    if (req.method === 'PATCH') {
+      // očekává: { order: Array<{ id, position }> }
+      const { order } = req.body || {};
+      if (!Array.isArray(order)) {
+        return res.status(400).json({ error: 'Body musí být { order: Array<{id, position}> }' });
+      }
+
+      let items = readItems();
+      const posById = new Map(
+        order.map(({ id, position }) => [Number(id), Number(position)])
+      );
+
+      // zapiš dodané pozice a znormalizuj na 1..N
+      items = items.map(it => (
+        posById.has(it.id)
+          ? { ...it, position: Number(posById.get(it.id)) }
+          : it
+      ));
+      items = normalizePositions(items);
+
+      writeItems(items);
+      return res.status(200).json({ ok: true, count: items.length });
+    }
+
     if (req.method === 'DELETE') {
       const { id } = req.body || {};
       const i = Number(id);
@@ -194,7 +218,7 @@ export default function handler(req, res) {
       return res.status(200).json({ message: 'Položka smazána.' });
     }
 
-    res.setHeader('Allow', 'GET, POST, PUT, DELETE');
+    res.setHeader('Allow', 'GET, POST, PUT, PATCH, DELETE');
     return res.status(405).json({ error: 'Metoda není povolena' });
   } catch (e) {
     console.error('API /api/items error:', e);
