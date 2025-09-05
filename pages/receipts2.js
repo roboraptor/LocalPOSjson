@@ -123,82 +123,87 @@ export default function ReceiptsPage() {
 
       {/* FILTRY */}
       <section className="card" style={{ marginBottom: '1rem', padding: '0.75rem' }}>
-        <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', alignItems: 'end' }}>
-          <div>
-            <label htmlFor="q" className="label">Hledat</label>
-            <input
-              id="q"
-              type="text"
-              className="input"
-              placeholder="ID, jméno, položky…"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-            />
+          <div className="grid2" >
+            <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'end' }}>
+              <div>
+                <label htmlFor="q" className="label">Hledat</label>
+                <input
+                id="q"
+                type="text"
+                className="input"
+                placeholder="ID, jméno, položky…"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="from" className="label">Od</label>
+                <input
+                id="from"
+                type="date"
+                className="input"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="to" className="label">Do</label>
+                <input
+                id="to"
+                type="date"
+                className="input"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                />
+              </div>
+
+            </div>
+            <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'end' }}>
+
+              <div>
+                <label htmlFor="issued" className="label">Issued to</label>
+                <select
+                id="issued"
+                className="select input"
+                value={issuedTo}
+                onChange={(e) => setIssuedTo(e.target.value)}
+                >
+                <option value="">Všichni</option>
+                {issuedToOptions.map((name) => (
+                    <option key={name} value={name}>{name}</option>
+                ))}
+                </select>
+              </div>
+
+              <div >  {/*style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}*/}
+                <label htmlFor="isStaff" className="label">Staff?</label>
+                <input
+                id="staffOnly"
+                type="checkbox"
+                
+                checked={staffOnly}
+                onChange={(e) => setStaffOnly(e.target.checked)}
+                />
+                <label htmlFor="staffOnly">Jen staff</label>
+              </div>
+
+              <div > {/*style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}*/}
+                <label htmlFor="reset" className="label">
+                    Zobrazeno: <strong>{filtered.length}</strong> / {receipts.length}
+                </label>
+                <button
+                    className="btn input"
+                    onClick={() => { setQ(''); setFrom(''); setTo(''); setStaffOnly(false); setIssuedTo(''); }}
+                >
+                    Reset filtrů
+                </button>
+
+              </div>
+
+            </div>
           </div>
-
-          <div>
-            <label htmlFor="issued" className="label">Issued to</label>
-            <select
-              id="issued"
-              className="select input"
-              value={issuedTo}
-              onChange={(e) => setIssuedTo(e.target.value)}
-            >
-              <option value="">Všichni</option>
-              {issuedToOptions.map((name) => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="from" className="label">Od</label>
-            <input
-              id="from"
-              type="date"
-              className="input"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="to" className="label">Do</label>
-            <input
-              id="to"
-              type="date"
-              className="input"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
-          </div>
-
-          <div >  {/*style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}*/}
-            <label htmlFor="isStaff" className="label">Staff?</label>
-            <input
-              id="staffOnly"
-              type="checkbox"
-              
-              checked={staffOnly}
-              onChange={(e) => setStaffOnly(e.target.checked)}
-            />
-            <label htmlFor="staffOnly">Jen staff</label>
-          </div>
-
-          <div > {/*style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}*/}
-            <label htmlFor="reset" className="label">
-                Zobrazeno: <strong>{filtered.length}</strong> / {receipts.length}
-            </label>
-            <button
-                className="btn input"
-                onClick={() => { setQ(''); setFrom(''); setTo(''); setStaffOnly(false); setIssuedTo(''); }}
-            >
-                Reset filtrů
-            </button>
-
-          </div>
-
-        </div>
 
         
       </section>
@@ -206,7 +211,7 @@ export default function ReceiptsPage() {
       {filtered.length === 0 ? (
         <p className="muted">Žádné uložené účtenky.</p>
       ) : (
-        <div className="grid" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+        <div className="grid" >
           {filtered.map((r) => {
             const total = (r.receipt || []).reduce((sum, i) => sum + (i.price || 0), 0);
             return (

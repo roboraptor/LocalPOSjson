@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import * as Fa from 'react-icons/fa6';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
@@ -40,6 +41,21 @@ export default function ReceiptsPage() {
     }
   };
 
+  const deleteAllReceipts = async () => {
+    if (!confirm('Opravdu chcete smazat všechny účtenky?')) return;
+    try {
+      const res = await fetch('/api/deleteReceipt', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all: true }),
+      });
+      if (!res.ok) throw new Error('Mazání selhalo');
+      setReceipts([]); // vyčistí frontend
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   if (loading) return <div className="container"><h1 className="pageTitle">Uložené účtenky</h1><div className="card skeleton" /><div className="card skeleton" /></div>;
   if (error) return <div className="container"><h1 className="pageTitle">Uložené účtenky</h1><div className="alert alert-error">{error}</div></div>;
 
@@ -47,9 +63,14 @@ export default function ReceiptsPage() {
     <div className="container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <h1 className="pageTitle">Uložené účtenky</h1>
-        <Link href="/receipts2">
-          <button className="btn btn-warning">V2</button>
-        </Link>
+        <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr', alignItems: 'end' }}>
+          <Link href="/receipts2">
+            <button className="btn btn-warning">Filtr-V2</button>
+          </Link>
+          <Link href="/export">
+            <button className="btn btn-warning">Export</button>
+          </Link>
+        </div>
       </div>
       
       {receipts.length === 0 ? (
@@ -90,6 +111,17 @@ export default function ReceiptsPage() {
           })}
         </div>
       )}
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+        <div></div>
+        
+        <div >
+          <button className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} onClick={deleteAllReceipts} >
+            <Fa.FaTrashCan /> Wipe
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }

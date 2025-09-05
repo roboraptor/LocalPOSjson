@@ -112,7 +112,12 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 
 /* Obecný responzivní grid (zůstává v core) */
 .grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
-@media (min-width: 720px) { .grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 750px) { .grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1400px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+
+.grid2 { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
+@media (min-width: 950px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+
 
 /* ================================
    3) KOMPONENTY core (karty, alerty, tlačítka)
