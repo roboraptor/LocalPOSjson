@@ -1,71 +1,73 @@
-# 🧾 Lokální Pokladna (Local POS)
+# 🧾 Local POS
 
-Jednoduchá pokladní aplikace postavená na **Next.js** + **React**, která ukládá účtenky do **JSON souboru** (plánovaně do SQLite). Projekt je zaměřený na jednoduché použití v malých provozech nebo jako experimentální lokální pokladna.
-
----
-
-## ✨ Funkce
-
-- Přehledná pokladna pro klikání položek do účtenky
-- Možnost přidání vlastní položky (např. mimo nabídku)
-- Správa položek (editor + kategorie)
-- Ukládání účtenek do `receipts.json`
-- Stránka s uloženými účtenkami
-- Možnost přiřazení účtenky na jméno nebo označení jako **Staff**
+A simple cash register application built with **Next.js** + **React**, storing receipts in a **JSON file** (planned migration to SQLite).\
+The project is aimed at easy use in small businesses or as an experimental local POS system.
 
 ---
 
-## 📂 Struktura projektu
+## ✨ Features
 
-- `/pages/index.js` – hlavní stránka pokladny
-- `/pages/items.js` – správa položek
-- `/pages/receipts.js` – přehled účtenek 
-- `/pages/api/*` – API pro ukládání/správu dat
-- `/data/items.json` – definice položek
-- `/data/example_items.json` - Vzorové položky
-- `/data/receipts.json` – uložené účtenky (vygeneruje se po uložení první účtenky)
-- `/components/Header.js` – navigace
-- `/styles/globals.css` – globální styly
+- Clean and intuitive POS interface for adding items to a receipt
+- Option to add custom items (e.g., outside the main menu)
+- Item management (editor + categories)
+- Receipts stored in `receipts.json`
+- Page with a list of saved receipts
+- Ability to assign a receipt to a name or mark it as **Staff**
 
 ---
 
-## 🚀 Spuštění projektu
+## 📂 Project structure
 
-- Pokud chceš mít v pokladně předpřipravené položky, přejmenuj soubor `data/example_items.json` na `data/items.json`.
-- Nainstaluj závislosti a spusť:
+- `/pages/index.js` – main POS page
+- `/pages/items.js` – item management
+- `/pages/receipts.js` – receipts overview
+- `/pages/api/*` – API for saving/managing data
+- `/data/items.json` – item definitions
+- `/data/example_items.json` – sample items
+- `/data/receipts.json` – saved receipts (created after the first receipt is stored)
+- `/components/Header.js` – navigation
+- `/styles/globals.css` – global styles
+
+---
+
+## 🚀 Running the project
+
+- If you want to have preloaded items in the POS, rename `data/example_items.json` to `data/items.json`.
+- Install dependencies and start the app:
+
 ```bash
 npm install
 npm run dev
 ```
 
-Aplikace poběží na [http://localhost:3000](http://localhost:3000).
+The app will run at [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## ✅ TODO / Plánovaný vývoj
+## ✅ TODO / Planned development
 
-- Možnost zakládat otevřené účty (platba později)
-- Logovat způsob platby (hotově, QR, kartou)
-- Rozdělení účtenek na zaplacené vs. otevřené
-- Opravit přidání vlastní položky, aby mohla být i sleva (negativní hodnota)
-- V poli „Cena“ zakázat zadávání jiných znaků než číslo a mínus
-- Doplnit možnost vlastních kategorií
-- Heartbeat do headeru jestli je server alive
+- Ability to create open tabs (pay later)
+- Log payment method (cash, QR, card)
+- Separate receipts into paid vs. open
+- Fix adding custom items so they can also be discounts (negative value)
+- Restrict the “Price” field to numbers and minus sign only
+- Add support for custom categories
+- Heartbeat in the header to check if the server is alive
 
 ### ✅ Done
 
-- Nahradit alert("účtenka uložena") za modal okno s timeoutem 5s a tlačítkem „Přeskočit“
-- Upravit stránku účtenek:
-  - Seřadit od nejnovější nahoře
-  - Přidat filtrování (Receipts V2)
-  
----
-
-## 📜 Licence
-
-Projekt je pod licencí **ISC**.
+- Replace `alert("receipt saved")` with a modal window (auto close after 5s + “Skip” button)
+- Update the receipts page:
+  - Sort newest first
+  - Add filtering (Receipts V2)
 
 ---
 
-👨‍💻 Autor: roboraptor66
+## 📜 License
+
+This project is licensed under the **ISC** license.
+
+---
+
+👨‍💻 Author: roboraptor66
 
