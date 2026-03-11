@@ -18,15 +18,15 @@ The project is aimed at easy use in small businesses or as an experimental local
 
 ## 📂 Project structure
 
-- `/pages/index.js` – main POS page
-- `/pages/items.js` – item management
-- `/pages/receipts.js` – receipts overview
-- `/pages/api/*` – API for saving/managing data
+- `/src/pages/index.js` – main POS page
+- `/src/pages/items.js` – item management
+- `/src/pages/receipts.js` – receipts overview
+- `/src/pages/api/*` – API for saving/managing data
 - `/data/items.json` – item definitions
 - `/data/example_items.json` – sample items
 - `/data/receipts.json` – saved receipts (created after the first receipt is stored)
-- `/components/Header.js` – navigation
-- `/styles/globals.css` – global styles
+- `/src/components/Header.js` – navigation
+- `/src/styles/globals.css` – global styles
 
 ---
 
