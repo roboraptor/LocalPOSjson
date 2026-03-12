@@ -176,87 +176,108 @@ export default function ItemsAdmin() {
       {err && <div className="alert alert-error">{err}</div>}
 
       {loading ? (
-        <>
-          <div className="card skeleton"></div>
-          <div className="card skeleton"></div>
-        </>
+        <div className="container">
+          <div className="card skeleton" style={{ height: '80px', marginBottom: '1rem' }} />
+          <div className="grid-tiny">
+            <div className="card skeleton" />
+            <div className="card skeleton" />
+            <div className="card skeleton" />
+            <div className="card skeleton" />
+          </div>
+        </div>
       ) : (
         <>
           {/* Formulář */}
-          <div className="card cardPad" style={{ marginBottom: 16 }}>
+          <section className="card" style={{ marginBottom: '1rem', padding: '0.75rem' }}>
             <form onSubmit={submit}>
-              <div className="grid-tiny">
-                <div className="formRow">
-                  <label className="label" htmlFor="name">Název</label>
-                  <input id="name" className="input"
-                    value={form.name}
-                    onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))} />
-                </div>
-                <div className="formRow">
-                  <label className="label" htmlFor="price">Cena (Kč)</label>
-                  <input id="price" className="input" type="number" inputMode="decimal"
-                    value={form.price}
-                    onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))} />
-                </div>
+              <div className="grid2">
+                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'end' }}>
+                  <div >
+                    <label className="form-label" htmlFor="name">Název</label>
+                    <input id="name" className="input"
+                      value={form.name}
+                      onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))} />
+                  </div>
+                  <div >
+                    <label className="form-label" htmlFor="price">Cena (Kč)</label>
+                    <input id="price" className="input" type="number" inputMode="decimal"
+                      value={form.price}
+                      onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))} />
+                  </div>
 
-                <div className="formRow">
-                  <label className="label" htmlFor="category">Kategorie</label>
-                  <select id="category" className="input"
-                    value={form.category}
-                    onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}>
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  <div >
+                    <label className="form-label" htmlFor="category">Kategorie</label>
+                    <select id="category" className="input"
+                      value={form.category}
+                      onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}>
+                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
                 </div>
-                <div className="formRow">
-                  <label className="label" htmlFor="position">Pozice</label>
-                  <input id="position" className="input" type="number" min="0"
-                    value={form.position || ''}
-                    onChange={(e) => setForm(f => ({ ...f, position: e.target.value }))} />
-                </div>
-                <div className="formRow">
-                  <label className="label">Ikona (FontAwesome)</label>
-                  <div style={{ gap: 8 }}>
-                    <div className="card" style={{ padding: 8, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                      <IconByName name={form.icon} size={24} />
-                      <code>{form.icon || '—'}</code>
+                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'end' }}>
+                  <div >
+                    <label className="form-label" htmlFor="position">Pozice</label>
+                    <input id="position" className="input" type="number" min="0"
+                      value={form.position || ''}
+                      onChange={(e) => setForm(f => ({ ...f, position: e.target.value }))} />
+                  </div>
+                  <div >
+                    <label className="form-label">Ikona (FontAwesome)</label>
+                    <div className="input grid2" style={{ padding: 6}}>
+                      
+                        <div style={{ width: 32, color: '#ccc'}}>
+                          <IconByName name={form.icon} size={32} />
+                        </div>
+                        <div style={{ color: '#ccc'}}>
+
+                          <code>{form.icon || '—'}</code>
+                        </div>
+  
+
+                    </div>
+                  </div>
+                
+                  {/* Tlačítka */}
+                  <div>
+                    <label className="form-label">Akce</label>
+                    <div className=''>
+                      <button className="btn btn-primary" style={{ height: '46px', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} type="submit">
+                        {form.id ? <IconByName name='FaRegFloppyDisk' size={24} /> : <IconByName name='FaRegSquarePlus' size={24} /> }
+                      </button>
+                      {form.id && (
+                        <button className="btn btn-danger" type="button" onClick={resetForm}>
+                          <IconByName name='FaXmark' size={24} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-               {/* Icon Picker */}
-              <div className="formRow">
-                <label className="label">Ikona (FontAwesome)</label>
-                <div className="grid" style={{ alignItems: 'start' }}>
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <IconPicker
-                      value={form.icon}
-                      onChange={(name: string) => setForm(f => ({ ...f, icon: name }))}
-                      placeholder="Hledat (např. coffee, user)…"
-                    />
+                {/* Icon Picker */}
+                <div >
+                  <label className="label">Ikona (FontAwesome)</label>
+                  <div className="grid" style={{ alignItems: 'start' }}>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <IconPicker
+                        value={form.icon}
+                        onChange={(name: string) => setForm(f => ({ ...f, icon: name }))}
+                        placeholder="Hledat (např. coffee, user)…"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              
 
-              {/* Tlačítka */}
-              <div className="grid" style={{ marginTop: 16 }}>
-                <button className="btn btn-primary" type="submit">
-                  {form.id ? 'Uložit změny' : 'Přidat položku'}
-                </button>
-                {form.id && (
-                  <button className="btn btn-ghost" type="button" onClick={resetForm}>
-                    Zrušit úpravu
-                  </button>
-                )}
-              </div>
+
             </form>
-          </div>
+          </section>
 
           {/* Toolbar */}
           <div className="card cardPad" style={{ marginBottom: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
             
               <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-                <div className="formRow">
+                <div >
                     <label className="label" htmlFor="filter">Filtr kategorie</label>
                     <select id="filter" className="input" value={filter} onChange={(e) => setFilter(e.target.value)}>
                     <option value="">— vše —</option>

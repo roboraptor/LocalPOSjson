@@ -115,7 +115,7 @@ export default function ReceiptsPage() {
           const itemsText = (r?.items || [])
             .map((it) => String(it?.name ?? ''))
             .join(' ');
-          const hay = `  `.toLowerCase();
+          const hay = `${id} ${person} ${itemsText}`.toLowerCase();
           if (!hay.includes(q.toLowerCase())) return false;
         }
 

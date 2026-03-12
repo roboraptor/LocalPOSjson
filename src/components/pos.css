@@ -45,6 +45,20 @@
   position: sticky; top: 0;  overflow-y: auto;
   box-shadow: -6px 0 16px rgba(0,0,0,.12);
 }
+.receipt {
+  display: flex; flex-direction: column; gap: var(--sp-2);
+  background: #fff; color: #111827;
+  padding: var(--sp-5); border: 1px dashed #cbd5e1; border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 1px #e5e7eb inset, 0 6px 14px rgba(0,0,0,.06);
+  font-feature-settings: "tnum"; font-variant-numeric: var(--tabular);
+}
+.receipt__title { margin: 0 0 var(--sp-3); font-size: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: var(--sp-2); font-weight: 700; }
+.receipt__row { display: flex; justify-content: space-between; gap: var(--sp-4); padding: 6px 0; border-bottom: 1px dashed #e5e7eb; font-size: 16px; }
+.receipt__row:last-child { border-bottom: none; }
+.receipt__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.receipt__price { font-variant-numeric: var(--tabular); }
+.receipt__total { margin-top: var(--sp-3); display: flex; justify-content: space-between; border-top: 2px solid #111827; padding-top: var(--sp-2); font-weight: 800; font-size: 18px; }
+.receipt__meta { color: #6b7280; font-size: 12px; }
 
 /* ================================================================
    2) GRID KONTEJNER KATALOGU
