@@ -1,13 +1,6 @@
-/* ================================
-   globals.css (core)
-   - necháváme reset, tokens, layout, utilities, header, buttons a print
-   - přidáváme importy na oddělené části: pos, receipts, modal
-   ================================ */
-
-/* --- imports na dílčí moduly --- */
-@import './pos.css';        /* POS specifika – katalogový grid, .btn-items, zvětšené dlaždice */
-@import './receipts.css';   /* styl pro stránku /receipts */
-@import './modal.css';      /* potvrzovací modal */
+@import '@/components/pos.css';        /* POS specifika – katalogový grid, .btn-items, zvětšené dlaždice */
+@import '@/components/receipts.css';   /* styl pro stránku /receipts */
+@import '@/components/modal.css';      /* potvrzovací modal */
 
 /* ================================
    0) CSS RESET + BASE
@@ -20,7 +13,7 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--fg);
 }
 
@@ -34,27 +27,33 @@ h1,h2,h3,h4,h5,h6 { margin: 0 0 .5rem; line-height: 1.2; }
 p { margin: 0 0 1rem; }
 code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 
+
 /* ================================
    1) DESIGN TOKENS (proměnné)
    ================================ */
 :root {
-  /* Barvy */
-  --bg: #0f1115;            /* základ pozadí */
-  --fg: #f5f7fb;            /* základ text */
-  --muted: #9aa3b2;         /* sekundární text */
-  --surface: #161a21;       /* karty, panely */
-  --surface-2: #0b0d11;     /* hlubší pozadí */
-  --border: #2a3240;
+  /* 1. Základní paleta (Dark Theme) */
+  --bg: #000000;            /* Pozadí stránky (Pure Black) */
+  --fg: #ffffff;            /* Hlavní text (White) */
+  --muted: #a3a3a3;         /* Sekundární text */
+  --body-bg: var(--bg);     /* Alias */
 
-  --primary: #3b82f6;       /* modrá – primární akce */
+  /* 2. Komponenty */
+  --surface: #1c1c1e;       /* Karty, Header (Dark Gray) */
+  --surface-2: #2c2c2e;     /* Inputy, tlačítka (Lighter Gray) */
+  --border: #3a3a3c;        /* Ohraničení */
+  --header-bg: var(--surface);
+
+  /* 3. Akční barvy */
+  --primary: #3b82f6;       /* Modrá */
   --primary-600: #2563eb;
-  --success: #22c55e;       /* zelená – potvrzení */
-  --success-700: #16a34a;
-  --danger: #ef4444;        /* červená – smazání */
-  --danger-700: #dc2626;
-  --warning: #ffd900;
-  --warning-700: #ff6f00; /* tmavší oranžová */
-  --info: #38bdf8;
+  --success: #22c55e;       /* Zelená */
+  --success-700: #15803d;
+  --danger: #ef4444;        /* Červená */
+  --danger-700: #b91c1c;
+  --warning: #f59e0b;       /* Oranžová (Amber) */
+  --warning-700: #b45309;
+  --info: #0ea5e9;
 
   /* Typografie & radius & shadow */
   --radius: 12px;
@@ -78,37 +77,30 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   --header-h: 62px;  /* výška headeru */
 }
 
-/* Volitelné: světlé schéma */
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f6f7fb;
-    --fg: #121417;
-    --muted: #667085;
-    --surface: #ffffff;
-    --surface-2: #f1f3f7;
-    --border: #e5e7eb;
-  }
+/* Default Header Styling */
+.navbar {
+  background-color: var(--header-bg);
+  margin-bottom: 0;
 }
 
-/* ================================
-   2) LAYOUT (core)
-   ================================ */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.card-header {
+  padding: var(--sp-4);
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .container {
   max-width: 1400px;
-  margin: var(--sp-10) auto;
-  padding: 0 var(--sp-4);
 }
+
 .pageTitle { font-size: 28px; font-weight: 700; margin: var(--sp-2) 0 var(--sp-4); }
 
-/* Hlavní dvousloupcový layout pro pokladnu */
-.mainLayout { display: flex; min-height: calc(100dvh - var(--header-h));}
-.leftColumn { flex: 1; padding: var(--sp-2) var(--sp-6); overflow-y: auto; }
-.receiptColumn {
-  width: 420px; background: var(--surface); color: var(--fg);
-  border-left: 1px solid var(--border); padding: var(--sp-6);
-  position: sticky; top: 0;  overflow-y: auto;
-  box-shadow: -6px 0 16px rgba(0,0,0,.12);
-}
 
 /* Obecný responzivní grid (zůstává v core) */
 .grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
@@ -124,15 +116,6 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 @media (min-width: 1100px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr 1fr; } }
 @media (min-width: 1370px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; } }
 
-/* ================================
-   3) KOMPONENTY core (karty, alerty, tlačítka)
-   ================================ */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
-
-.alert { padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); margin-bottom: var(--sp-4); }
-.alert-error { background: rgba(239, 68, 68, .12); color: #fecaca; border-color: rgba(239,68,68,.35); }
-.alert-info  { background: rgba(56, 189, 248, .12); color: #bae6fd; border-color: rgba(56,189,248,.35); }
-
 .skeleton {
   height: 140px; border-radius: var(--radius);
   background: linear-gradient(90deg, #1d232e 25%, #2b3443 37%, #1d232e 63%);
@@ -140,6 +123,37 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 }
 @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
 
+/* Default Form Styling */
+.form-label,.form-check-label { font-weight: 600; color: var(--muted); font-size: 14px; }
+
+.form-control,
+.form-select {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--fg);
+}
+
+.form-check-input:focus,
+.form-control:focus,
+.form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.5rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  background-color: var(--surface);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.form-check-input {
+  width: 16px; height: 16px; border: 1px solid var(--border); border-radius: 4px;
+  background-color: var(--surface-2); color: var(--primary);
+}
+.form-check-input:checked {
+  background-color: var(--primary);
+  border-color: var(--primary-600);
+}
 /* Tlačítka (základ) */
 .btn {
   appearance: none; border: 1px solid transparent; border-radius: var(--radius-sm);
@@ -159,30 +173,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 /* Utilities */
 .cardPad { padding: var(--sp-4); }
 .formRow { display: grid; gap: var(--sp-2); margin-bottom: var(--sp-3); }
-.form-label { font-weight: 600; color: var(--muted); font-size: 14px; }
 .input { width: 100%; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface-2); color: var(--fg); }
 .input:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
 .badge { display: inline-block; padding: 2px 8px; font-size: 12px; border-radius: 8px; background: var(--primary); color: #fff; margin-left: 6px; }
 .badge-staff { background: var(--danger); }
-
-/* Header (ponecháme v core) */
-.siteHeader { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--sp-3) var(--sp-4); position: sticky; top: 0; z-index: 100; }
-.siteHeader__inner { display: flex; align-items: center; justify-content: space-between; max-width: 960px; margin: 0 auto; }
-.siteHeader__logo { font-size: 20px; font-weight: 700; }
-.siteHeader__nav { display: flex; gap: var(--sp-4); }
-.siteHeader__link { color: var(--fg); font-weight: 500; padding: 6px 10px; border-radius: var(--radius-sm); transition: background .2s ease; }
-.siteHeader__link:hover { background: var(--surface-2); }
-.siteHeader__link.active { background: var(--primary); color: #fff; }
-.sectionTitle { font-size: 18px; font-weight: 700; margin: var(--sp-2) 0 var(--sp-2); }
-
-/* PRINT zůstává zde, ať funguje univerzálně */
-@media print {
-  body { background: #fff; color: #111; }
-  .mainLayout, .leftColumn, .receiptColumn, .container { all: unset; }
-  .receipt { box-shadow: none; border-color: #ddd; }
-  .btn, .saveButton, .alert, .skeleton { display: none !important; }
-}
-
-/* ================================
-   KONEC globals.css (core)
-   ================================ */

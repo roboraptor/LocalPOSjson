@@ -1,19 +1,29 @@
+// c:\projects\LocalPOSjson\src\app\receipts\page.tsx
+'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 import * as Fa from 'react-icons/fa6';
 import Link from 'next/link';
+import { Item } from '@/types/db';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
+interface ParsedReceipt {
+  id: number;
+  created_at: string;
+  issued_to: string | null;
+  items: Item[]; // API už vrací parsovaný JSON
+}
+
 export default function ReceiptsPage() {
-  const [receipts, setReceipts] = useState([]);
+  const [receipts, setReceipts] = useState<ParsedReceipt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // ---- FILTRY ----
   const [q, setQ] = useState('');                 // fulltext
   const [from, setFrom] = useState('');           // YYYY-MM-DD
   const [to, setTo] = useState('');               // YYYY-MM-DD
-  const [staffOnly, setStaffOnly] = useState(false);
   const [issuedTo, setIssuedTo] = useState('');   // přesný match
 
   useEffect(() => {
@@ -21,11 +31,12 @@ export default function ReceiptsPage() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch('/api/getReceipts', { cache: 'no-store' });
+        // Nový endpoint
+        const res = await fetch('/api/receipts', { cache: 'no-store' });
         if (!res.ok) throw new Error('Nepodařilo se načíst účtenky');
         const data = await res.json();
         setReceipts(Array.isArray(data) ? data : []);
-      } catch (err) {
+      } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
@@ -34,17 +45,17 @@ export default function ReceiptsPage() {
     fetchReceipts();
   }, []);
 
-  const deleteReceipt = async (id) => {
+  const deleteReceipt = async (id: number) => {
     if (!confirm('Opravdu chcete tuto účtenku smazat?')) return;
     try {
-      const res = await fetch('/api/deleteReceipt', {
-        method: 'POST',
+      const res = await fetch('/api/receipts', {
+        method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
       });
       if (!res.ok) throw new Error('Nepodařilo se smazat účtenku');
       setReceipts((prev) => prev.filter((r) => r.id !== id));
-    } catch (err) {
+    } catch (err: any) {
       alert(err.message);
     }
   };
@@ -52,14 +63,14 @@ export default function ReceiptsPage() {
   const deleteAllReceipts = async () => {
     if (!confirm('Opravdu chcete smazat všechny účtenky?')) return;
     try {
-      const res = await fetch('/api/deleteReceipt', {
+      const res = await fetch('/api/receipts', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ all: true }),
       });
       if (!res.ok) throw new Error('Mazání selhalo');
       setReceipts([]); // vyčistí frontend
-    } catch (err) {
+    } catch (err: any) {
       alert(err.message);
     }
   };
@@ -76,16 +87,14 @@ export default function ReceiptsPage() {
 
   // --- seřazení & filtrování (nejnovější nahoře) ---
   const filtered = useMemo(() => {
-    const toTs = (d) => {
+    const toTs = (d: string) => {
       if (!d) return 0;
-      const n = Number(d);
-      if (Number.isFinite(n)) return n;
       const t = new Date(d).getTime();
       return Number.isFinite(t) ? t : 0;
     };
 
     const fromBound = from ? new Date(`${from}T00:00:00`).getTime() : null;
-    const toBound   = to   ? new Date(`${to}T23:59:59`).getTime()   : null;
+    const toBound   = to   ? new Date(`T23:59:59`).getTime()   : null;
 
     return [...receipts]
       // sort desc by created_at (nejnovější první)
@@ -97,23 +106,22 @@ export default function ReceiptsPage() {
         if (fromBound && Number.isFinite(fromBound) && created < fromBound) return false;
         if (toBound   && Number.isFinite(toBound)   && created > toBound)   return false;
 
-        if (staffOnly && !r?.is_staff) return false;
-
-        if (issuedTo && (r?.issued_to ?? '') !== issuedTo) return false;
+        // Ensure strict string comparison for filtering
+        if (issuedTo && String(r?.issued_to ?? '').trim() !== String(issuedTo).trim()) return false;
 
         if (q) {
           const id = String(r?.id ?? '');
           const person = String(r?.issued_to ?? '');
-          const itemsText = (r?.receipt ?? [])
+          const itemsText = (r?.items || [])
             .map((it) => String(it?.name ?? ''))
             .join(' ');
-          const hay = `${id} ${person} ${itemsText}`.toLowerCase();
+          const hay = `  `.toLowerCase();
           if (!hay.includes(q.toLowerCase())) return false;
         }
 
         return true;
       });
-  }, [receipts, q, from, to, staffOnly, issuedTo]);
+  }, [receipts, q, from, to, issuedTo]);
 
   if (loading) {
     return (
@@ -149,7 +157,7 @@ export default function ReceiptsPage() {
           <div className="grid2" >
             <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'end' }}>
               <div>
-                <label htmlFor="q" className="label">Hledat</label>
+                <label htmlFor="q" className="form-label">Hledat</label>
                 <input
                 id="q"
                 type="text"
@@ -161,7 +169,7 @@ export default function ReceiptsPage() {
               </div>
 
               <div>
-                <label htmlFor="from" className="label">Od</label>
+                <label htmlFor="from" className="form-label">Od</label>
                 <input
                 id="from"
                 type="date"
@@ -172,7 +180,7 @@ export default function ReceiptsPage() {
               </div>
 
               <div>
-                <label htmlFor="to" className="label">Do</label>
+                <label htmlFor="to" className="form-label">Do</label>
                 <input
                 id="to"
                 type="date"
@@ -186,7 +194,7 @@ export default function ReceiptsPage() {
             <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'end' }}>
 
               <div>
-                <label htmlFor="issued" className="label">Issued to</label>
+                <label htmlFor="issued" className="form-label">Issued to</label>
                 <select
                 id="issued"
                 className="select input"
@@ -200,35 +208,20 @@ export default function ReceiptsPage() {
                 </select>
               </div>
 
-              <div >  {/*style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}*/}
-                <label htmlFor="isStaff" className="label">Staff?</label>
-                <input
-                id="staffOnly"
-                type="checkbox"
-                
-                checked={staffOnly}
-                onChange={(e) => setStaffOnly(e.target.checked)}
-                />
-                <label htmlFor="staffOnly">Jen staff</label>
-              </div>
-
-              <div > {/*style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}*/}
-                <label htmlFor="reset" className="label">
+              <div >
+                <label htmlFor="reset" className="form-label">
                     Zobrazeno: <strong>{filtered.length}</strong> / {receipts.length}
                 </label>
                 <button
                     className="btn input"
-                    onClick={() => { setQ(''); setFrom(''); setTo(''); setStaffOnly(false); setIssuedTo(''); }}
+                    onClick={() => { setQ(''); setFrom(''); setTo(''); setIssuedTo(''); }}
                 >
                     Reset filtrů
                 </button>
-
               </div>
 
             </div>
           </div>
-
-        
       </section>
 
       {filtered.length === 0 ? (
@@ -236,7 +229,8 @@ export default function ReceiptsPage() {
       ) : (
         <div className="grid" >
           {filtered.map((r) => {
-            const total = (r.receipt || []).reduce((sum, i) => sum + (i.price || 0), 0);
+            // Používáme r.items místo starého r.receipt
+            const total = (r.items || []).reduce((sum, i) => sum + (i.price || 0), 0);
             return (
               <section key={r.id} className="card receiptCard">
                 <header className="receiptHeader">
@@ -245,14 +239,13 @@ export default function ReceiptsPage() {
                     <div className="receiptSub">
                       {new Date(r.created_at).toLocaleString('cs-CZ')}
                       {r.issued_to ? ` • Pro: ${r.issued_to}` : ''}
-                      {r.is_staff ? ' • 👤 Staff' : ''}
                     </div>
                   </div>
                   <button className="btn btn-danger" onClick={() => deleteReceipt(r.id)}><Fa.FaTrashCan /></button>
                 </header>
 
                 <div className="receiptBody">
-                  {(r.receipt || []).map((item, i) => (
+                  {(r.items || []).map((item, i) => (
                     <div key={i} className="receiptRow">
                       <span className="itemName">{item.name}</span>
                       <span className="itemPrice">{czk.format(item.price || 0)}</span>
@@ -270,12 +263,9 @@ export default function ReceiptsPage() {
         </div>
       )}
 
-
-
       <div className="card cardPad" style={{ marginBottom: 16, marginTop: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <div>
-        </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+        <div></div>
+        <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center' }} onClick={deleteAllReceipts} >
             <Fa.FaTrashCan /> Smazat Vše
           </button>

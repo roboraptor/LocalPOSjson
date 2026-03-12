@@ -1,6 +1,6 @@
 # 🧾 Local POS
 
-A simple cash register application built with **Next.js** + **React**, storing receipts in a **JSON file** (planned migration to SQLite).\
+A simple cash register application built with **Next.js** + **React**, storing receipts in **SQLite** (via better-sqlite3).\
 The project is aimed at easy use in small businesses or as an experimental local POS system.
 
 ---
@@ -10,7 +10,7 @@ The project is aimed at easy use in small businesses or as an experimental local
 - Clean and intuitive POS interface for adding items to a receipt
 - Option to add custom items (e.g., outside the main menu)
 - Item management (editor + categories)
-- Receipts stored in `receipts.json`
+- Data stored in local SQLite database (`data/pos.db`)
 - Page with a list of saved receipts
 - Ability to assign a receipt to a name or mark it as **Staff**
 
@@ -22,6 +22,7 @@ The project is aimed at easy use in small businesses or as an experimental local
 - `/src/pages/items.js` – item management
 - `/src/pages/receipts.js` – receipts overview
 - `/src/pages/api/*` – API for saving/managing data
+- `/src/lib/db.js` – Database connection and schema
 - `/data/items.json` – item definitions
 - `/data/example_items.json` – sample items
 - `/data/receipts.json` – saved receipts (created after the first receipt is stored)
@@ -37,6 +38,7 @@ The project is aimed at easy use in small businesses or as an experimental local
 
 ```bash
 npm install
+node scripts/migrate.js  # Run once to migrate JSON data to SQLite
 npm run dev
 ```
 
@@ -70,4 +72,3 @@ This project is licensed under the **ISC** license.
 ---
 
 👨‍💻 Author: roboraptor66
-

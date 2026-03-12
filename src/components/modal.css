@@ -1,0 +1,11 @@
+/* ================================
+   modal.css — potvrzovací modal
+   ================================ */
+.modalOverlay { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); animation: modalFadeIn .15s ease-out; }
+.modalCard { width: min(420px, 92vw); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-md); padding: var(--sp-6); text-align: center; }
+.modalIcon { font-size: 48px; line-height: 1; margin-bottom: var(--sp-4); }
+.modalTitle { font-size: 20px; font-weight: 800; margin-bottom: var(--sp-2); }
+.modalText { color: var(--muted); margin-bottom: var(--sp-6); }
+.modalActions { display: flex; justify-content: center; }
+@keyframes modalFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .modalOverlay { animation: none; } }

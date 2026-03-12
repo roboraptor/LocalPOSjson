@@ -1,0 +1,255 @@
+/* ==================================================================
+   POS (katalog položek) — sjednocené a okomentované styly
+   ------------------------------------------------------------------
+   Cíl:
+   - Jeden zdroj pravdy pro proměnné (bez zbytečných duplikátů)
+   - Jasné oddíly dle funkce
+   - Komentáře k chování a důvodům voleb
+   ================================================================== */
+
+
+/* ================================================================
+   1) PROMĚNNÉ (POS scope)
+   - Lze přepsat lokálně na kontejneru (např. .buttons.compact { ... })
+   - Spoléhá na core tokeny z globals.css: --sp-*, --radius-sm, --tabular
+   ================================================================ */
+:root {
+  /* Rozměry dlaždic */
+  --item-min: 140px;                  /* min. šířka jedné dlaždice v gridu */
+  --item-row: 92px;                   /* výška řádku gridu (sjednocuje výšky) */
+  --item-pad: 8px;                   /* vnitřní odsazení obsahu tlačítka */
+  --item-icon: 20px;                  /* velikost čtverce pro ikonu uvnitř dlaždice */
+
+  /* Základní typografie pro tlačítko */
+  --item-font: clamp(0.95rem, 1.8vw, 1.1rem);
+
+  /* Jemné ladění typografie (název/cena) */
+  --item-text-align: left;
+
+  --item-title-font: clamp(1rem, 2.1vw, 1.25rem);
+  --item-title-weight: 600;
+  --item-title-lines: 2;             /* 2–3 podle potřeby */
+  --item-title-tracking: 0;
+
+  --item-price-font: clamp(1.05rem, 2.4vw, 1.3rem);
+  --item-price-weight: 700;
+  --item-price-tracking: 0;
+}
+
+/* Hlavní dvousloupcový layout pro pokladnu */
+.mainLayout { display: flex; min-height: calc(100dvh - var(--header-h));}
+.leftColumn { flex: 1; padding: var(--sp-2) var(--sp-6); overflow-y: auto; }
+.receiptColumn {
+  width: 420px; background: var(--surface); color: var(--fg);
+  border-left: 1px solid var(--border); padding: var(--sp-6);
+  position: sticky; top: 0;  overflow-y: auto;
+  box-shadow: -6px 0 16px rgba(0,0,0,.12);
+}
+
+/* ================================================================
+   2) GRID KONTEJNER KATALOGU
+   - Umí jak legacy .buttons, tak novější .btn-grid
+   - repeat(auto-fill, minmax()) → fluidní počet sloupců
+   ================================================================ */
+.buttons,
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--item-min), 1fr));
+  grid-auto-rows: var(--item-row);
+  gap: var(--sp-2);
+  align-items: stretch;
+  max-width: 100%;
+}
+.sectionTitle { font-size: 18px; font-weight: 700; margin: var(--sp-2) 0 var(--sp-2); }
+
+
+/* ================================================================
+   3) ZÁKLAD KATALOGOVÉHO TLAČÍTKA
+   - Stabilní rozvrh (vypnuté transformace), 2 řádky: obsah + spodní lišta
+   - .btn-items je „host“ pro všechny varianty (vč. tri-layoutu)
+   ================================================================ */
+.btn-items {
+  display: grid;
+  grid-template-rows: 1fr auto;       /* 1) vršek, 2) spodní lišta (může být prázdná) */
+  gap: 6px;
+  align-items: center;
+  justify-items: start;
+  width: 100%;
+  min-height: var(--item-row);        /* sladěno s grid-auto-rows */
+  padding: var(--item-pad) var(--sp-4);
+  border-radius: var(--radius-sm);
+
+  /* Typografie + chování textu */
+  font-size: var(--item-font);
+  text-align: var(--item-text-align);
+  white-space: normal;
+  overflow-wrap: anywhere;
+
+  /* Stabilní UI (bez poskakování při kliku/hoveru) */
+  transition: none;
+  transform: none;
+}
+.btn-items:hover,
+.btn-items:active {
+  filter: none;
+  transform: none;
+}
+
+
+/* ================================================================
+   4) VNITŘNÍ LAYOUT (výchozí, ne-tri)
+   - Horní řádek: ikona + název ve 2 sloupcích
+   - Spodní řádek: typicky badge (vlevo) + cena (vpravo) — volitelné
+   ================================================================ */
+
+.btn-items__icon {
+  color:rgba(0, 0, 0, 0.4);
+  width: var(--item-icon);
+  height: var(--item-icon);
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  /* Pokud nechceš podbarvení v default layoutu, nech prázdné pozadí */
+  /* background: rgba(255, 255, 255, .08); */
+}
+.btn-items__icon svg {
+  width: 70%;
+  height: 70%;
+}
+
+.btn-items__title {
+  /* Společné pro všechny layouty (default i tri) */
+  font-size: var(--item-title-font);
+  font-weight: var(--item-title-weight);
+  letter-spacing: var(--item-title-tracking);
+  line-height: 1.25;
+
+  /* Multiline clamp (WebKit) + Fallback */
+  display: -webkit-box;
+  -webkit-line-clamp: var(--item-title-lines);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: calc(1.25em * var(--item-title-lines));
+}
+
+
+.btn-items__price {
+  /* Společné vlastnosti ceny (platí i v tri-layoutu) */
+  font-variant-numeric: var(--tabular);
+  font-size: var(--item-price-font);
+  font-weight: var(--item-price-weight);
+  letter-spacing: var(--item-price-tracking);
+  line-height: 1.15;
+  white-space: nowrap;
+  /* V default layoutu chceme cenu často vpravo */
+  margin-left: auto;
+}
+
+
+/* ================================================================
+   5) VARIANTY VELIKOSTI / ZAROVNÁNÍ (modifier třídy)
+   ================================================================ */
+
+/* Větší výška a ikona (např. na kiosku/tabletu) */
+.btn-items--lg {
+  --item-row: 112px;
+  --item-icon: 28px;
+}
+
+/* Kompaktnější dlaždice (menší text, méně řádků) */
+.btn-items.compact,
+.buttons.compact .btn-items {
+  --item-title-font: clamp(0.95rem, 2vw, 1.1rem);
+  --item-title-lines: 2;
+  --item-price-font: clamp(1rem, 2.2vw, 1.2rem);
+}
+
+/* Centrovaný obsah (např. krátké názvy, bez ikony vlevo) */
+.btn-items.center,
+.buttons.center .btn-items {
+  --item-text-align: center;
+}
+.btn-items.center .btn-items__top {
+  grid-template-columns: 1fr;     /* ikonu můžeš přesunout nad titulek nebo skrýt */
+}
+.btn-items.center .btn-items__icon {
+  margin-inline: auto;
+}
+
+/* Důraz na název (delší názvy, povol 3 řádky) */
+.btn-items.emphasis,
+.buttons.emphasis .btn-items {
+  --item-title-font: clamp(1.05rem, 2.4vw, 1.35rem);
+  --item-title-lines: 3;
+}
+
+
+/* ================================================================
+   6) SPECIÁLNÍ ROZVRH: TRI-LAYOUT
+   - Název: levý horní roh
+   - Cena:  levý dolní roh
+   - Ikona: pravý střed (vertikálně centrovaná)
+   - Použij na tlačítku className="btn-items btn-items--tri"
+   ================================================================ */
+.btn-items--tri {
+  position: relative;                            /* umožní absolutní pozicování dětí */
+  min-height: var(--item-row);                   /* zachová jednotnou výšku dlaždice */
+  padding-right: calc(var(--sp-4) + 48px);       /* rezerva pro ikonu vpravo */
+}
+
+/* Název – levý horní roh */
+.btn-items--tri .btn-items__title {
+  position: absolute;
+  top: var(--item-pad);
+  left: var(--sp-2);
+  /* V tri-layoutu většinou 1–2 řádky: můžeš přepnout na nowrap podle potřeby */
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: ellipsis;
+  text-align: left;                             
+}
+
+/* Cena – levý dolní roh */
+.btn-items--tri .btn-items__price {
+  position: absolute;
+  bottom: var(--item-pad);
+  left: var(--sp-2);
+  margin-left: 0;                                 /* přepíšeme default (vpravo) */
+}
+
+/* Ikona – pravá strana uprostřed */
+.btn-items--tri .btn-items__icon {
+  position: absolute;
+  right: -13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;                                    /* můžeš upravit podle vkusu */
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0);             /* transparentní, jak sis přál */
+}
+.btn-items--tri .btn-items__icon svg {
+  width: 70%;
+  height: 70%;
+}
+
+
+/* ================================================================
+   7) RESPONZIVITA
+   - Na úzkých displejích zmenšíme min. šířku a výšku dlaždic,
+     abychom zachovali dobré „touch targets“ a hustotu mřížky.
+   ================================================================ */
+@media (max-width: 720px) {
+  :root {
+    --item-min: 90px;
+    --item-row: 50px; /* stále touch-friendly (≥48px) */
+  }
+
+  /* (Volitelně) zmenšení ikony pro menší dlaždice
+  .btn-items--tri .btn-items__icon { width: 36px; height: 36px; }
+  */
+}
+
+/* ========================== KONEC pos.css ========================== */
