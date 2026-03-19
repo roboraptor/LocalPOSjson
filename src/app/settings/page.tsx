@@ -14,7 +14,7 @@ export default function SettingsPage() {
       </div>
       <div className="row">
         <div className="col-md-3">
-          <div className="list-group">
+          <div className="shadow-sm border-0 list-group">
             <button 
               className={`list-group-item list-group-item-action ${activeTab === 'general' ? 'active' : ''}`}
               onClick={() => setActiveTab('general')}

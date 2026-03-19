@@ -109,7 +109,7 @@ export default function ExportPage() {
     <div className="container">
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
         <h1 className="pageTitle">Export dat</h1>
-        <Link href="/" className="btn btn-warning">Zpět na POS</Link>
+
       </div>
 
       <div className="grid">

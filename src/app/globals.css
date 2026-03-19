@@ -39,9 +39,9 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   --body-bg: var(--bg);     /* Alias */
 
   /* 2. Komponenty */
-  --surface: #1c1c1e;       /* Karty, Header (Dark Gray) */
-  --surface-2: #2c2c2e;     /* Inputy, tlačítka (Lighter Gray) */
-  --border: #3a3a3c;        /* Ohraničení */
+  --surface: #222;       /* Karty, Header (Dark Gray) */
+  --surface-2: #444;     /* Inputy, tlačítka (Lighter Gray) */
+  --border: #555;        /* Ohraničení */
   --header-bg: var(--surface);
 
   /* 3. Akční barvy */
@@ -110,6 +110,8 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 .grid2 { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
 @media (min-width: 950px) { .grid2 { grid-template-columns: 1fr 1fr; } }
 
+.grid2-perma { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+
 .grid-tiny { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
 @media (min-width: 560px) { .grid-tiny { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 830px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr; } }
@@ -122,6 +124,62 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   background-size: 400% 100%; animation: shimmer 1.4s ease infinite; margin-bottom: var(--sp-4);
 }
 @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+/* ================================
+   List Group
+   ================================ */
+.list-group {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0;
+  margin-bottom: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden; /* Clips the corners of the first/last items */
+}
+
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--fg);
+  text-decoration: none;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  transition: background-color 0.15s ease-in-out;
+}
+
+.list-group-item:last-child {
+
+}
+
+/* Interactive states */
+.list-group-item:hover,
+.list-group-item:focus-visible {
+  z-index: 1;
+  background-color: var(--surface-2);
+}
+
+.list-group-item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+/* .active class for selected item */
+.list-group-item.active {
+  z-index: 2;
+  color: #fff;
+  background-color: var(--primary);
+  border-color: var(--primary-600);
+}
+
+/* Disabled state */
+.list-group-item.disabled, .list-group-item:disabled {
+  color: var(--muted);
+  pointer-events: none;
+  background-color: var(--surface);
+  opacity: 0.7;
+}
+
 
 /* Default Form Styling */
 .form-label,.form-check-label { font-weight: 600; color: var(--muted); font-size: 14px; }
@@ -167,8 +225,14 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 .btn-success { background: var(--success); border-color: var(--success-700); color: #000; }
 .btn-danger  { background: var(--danger);  border-color: var(--danger-700);  color: #fff; }
 .btn-warning { background: var(--warning); border-color: var(--warning-700);  color: #000; }
-.btn-ghost   { background: transparent; color: var(--fg); border-color: var(--border); }
+.btn-ghost   { background: var(--muted); color: var(--fg); border-color: var(--fg); }
 .btn-block   { width: 100%; }
+
+.super-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 /* Utilities */
 .cardPad { padding: var(--sp-4); }

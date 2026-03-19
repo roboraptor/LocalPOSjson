@@ -10,20 +10,22 @@ export default function Header() {
 
   const navLinks = [
     { href: '/', label: 'Pokladna' },
+    { href: '/items', label: 'Položky' },
     { href: '/receipts', label: 'Účtenky' },
-    { href: '/items', label: 'Editor položek' },
+    { href: '/export', label: 'Export' },
     { href: '/settings', label: 'Nastavení' },
   ];
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <nav className="navbar navbar-expand-sm navbar-dark shadow-sm">
       <div className="container">
         <Link href="/" className="navbar-brand fw-bold">
           LocalPOSsqlite
         </Link>
 
         <button 
-          className="navbar-toggler" 
+          className="navbar-toggler super-center btn btn-warning" 
+          style={{  height: 34}}
           type="button" 
           onClick={() => setExpanded(!expanded)}
           aria-label="Toggle navigation"
@@ -37,7 +39,8 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`nav-link ${pathname === link.href ? 'active' : ''}`}
+                className={`btn btn-warning nav-link super-center ${pathname === link.href ? 'active' : ''}`}
+                style={{ marginLeft: 5, marginBottom:3, height: 34}}
                 onClick={() => setExpanded(false)}
               >
                 {link.label}

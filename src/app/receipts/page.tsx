@@ -147,8 +147,7 @@ export default function ReceiptsPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center'}}>
         <h1 className="pageTitle">Uložené účtenky</h1>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <Link href="/" className="btn btn-warning">POS</Link>
-          <Link href="/export" className="btn btn-warning">Export</Link>
+
         </div>
       </div>
 

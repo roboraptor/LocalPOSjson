@@ -1,7 +1,7 @@
 // c:\projects\LocalPOSjson\src\app\items\page.tsx
 'use client';
 
-import { useState, useEffect, useRef, FormEvent, DragEvent } from 'react';
+import { useState, useEffect, useRef, FormEvent, DragEvent, useMemo } from 'react';
 import Link from 'next/link';
 import * as Fa from 'react-icons/fa6';
 import IconPicker from '@/components/IconPicker';
@@ -10,6 +10,23 @@ import { Item } from '@/types/db';
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 const CATEGORIES = ['Nápoje', 'Jídlo', 'Ostatní'];
 
+// Seznam oblíbených/často používaných ikon pro rychlejší výběr
+const FAVORITE_ICONS = [
+  'FaCubes',
+  'FaMugSaucer',
+  'FaBeerMugEmpty',
+  'FaWineGlass',
+  'FaGlassWater',
+  'FaUtensils',
+  'FaBurger',
+  'FaPizzaSlice',
+  'FaIceCream',
+  'FaCakeCandles',
+  'FaMoneyBillWave',
+  'FaCreditCard',
+  'FaReceipt',
+];
+
 // Pomocná komponenta pro dynamické ikony
 function IconByName({ name, size = 18 }: { name: string | null | undefined; size?: number }) {
   const iconName = name as keyof typeof Fa;
@@ -17,12 +34,39 @@ function IconByName({ name, size = 18 }: { name: string | null | undefined; size
   return <Comp size={size} />;
 }
 
+// Nová komponenta pro kartu položky pro lepší přehlednost
+function ItemCard({ item, onDragStart, onDrop, onEdit, onDelete }: {
+  item: Item;
+  onDragStart: (e: DragEvent, id: number) => void;
+  onDrop: (e: DragEvent, id: number) => void;
+  onEdit: (item: Item) => void;
+  onDelete: (id: number) => void;
+}) {
+  return (
+    <section className="card cardPad drag-card" draggable onDragStart={(e) => onDragStart(e, item.id)} onDrop={(e) => onDrop(e, item.id)}>
+      <header className="receiptHeader" style={{ padding: 0, borderBottom: 'none', alignItems: 'center' }}>
+        <div className="receiptTitle" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="drag-handle" title="Táhni pro změnu pořadí" style={{ cursor: 'grab', display: 'inline-flex', alignItems: 'center' }}><Fa.FaGripLines /></span>
+          <IconByName name={item.icon} />
+          <span>#{item.position}</span>
+          <span>{item.name}</span>
+        </div>
+        <div className="totalPrice">{czk.format(item.price || 0)}</div>
+      </header>
+      <div className="muted">Kategorie: <strong>{item.category || 'Ostatní'}</strong></div>
+      <div style={{ marginTop: 12, display: 'flex', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
+        <button className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => onEdit(item)}><Fa.FaWrench /> Upravit</button>
+        <button className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => onDelete(item.id)}><Fa.FaTrashCan /> Smazat</button>
+      </div>
+    </section>
+  );
+}
+
 export default function ItemsAdmin() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingOrder, setSavingOrder] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [filter, setFilter] = useState('');
   const [dirty, setDirty] = useState(false);
   const dragIdRef = useRef<number | null>(null);
   
@@ -40,8 +84,7 @@ export default function ItemsAdmin() {
   const load = async () => {
     setLoading(true); setErr(null);
     try {
-      const url = filter ? `/api/items?category=${encodeURIComponent(filter)}` : '/api/items';
-      const res = await fetch(url, { cache: 'no-store' });
+      const res = await fetch('/api/items', { cache: 'no-store' });
       if (!res.ok) throw new Error('Nepodařilo se načíst položky.');
       const data: Item[] = await res.json();
 
@@ -56,7 +99,28 @@ export default function ItemsAdmin() {
     } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, [filter]);
+  useEffect(() => { load(); }, []);
+
+  const groupedItems = useMemo(() => {
+    const groups: Record<string, Item[]> = items.reduce((acc, item) => {
+      const category = item.category || 'Ostatní';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(item);
+      return acc;
+    }, {} as Record<string, Item[]>);
+
+    const groupNames = Object.keys(groups).sort((a, b) => {
+        const indexA = CATEGORIES.indexOf(a);
+        const indexB = CATEGORIES.indexOf(b);
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        return a.localeCompare(b);
+    });
+    return groupNames.map(name => ({ name, items: groups[name] }));
+  }, [items]);
 
   const resetForm = () => setForm(emptyForm);
 
@@ -168,8 +232,7 @@ export default function ItemsAdmin() {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center'}}>
         <h1 className="pageTitle">Položky menu</h1>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <Link href="/" className="btn btn-warning">POS</Link>
-          <Link href="/export" className="btn btn-warning">Export</Link>
+
         </div>
       </div>
 
@@ -223,14 +286,13 @@ export default function ItemsAdmin() {
                   </div>
                   <div >
                     <label className="form-label">Ikona (FontAwesome)</label>
-                    <div className="input grid2" style={{ padding: 6}}>
+                    <div className="input grid2-perma" style={{ padding: 6}}>
                       
-                        <div style={{ width: 32, color: '#ccc'}}>
+                        <div style={{ width: 32, color: '#fff'}}>
                           <IconByName name={form.icon} size={32} />
                         </div>
-                        <div style={{ color: '#ccc'}}>
-
-                          <code>{form.icon || '—'}</code>
+                        <div>
+                          <code style={{ color: '#ccc'}}>{form.icon || '—'}</code>
                         </div>
   
 
@@ -240,12 +302,12 @@ export default function ItemsAdmin() {
                   {/* Tlačítka */}
                   <div>
                     <label className="form-label">Akce</label>
-                    <div className=''>
-                      <button className="btn btn-primary" style={{ height: '46px', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} type="submit">
+                    <div className="grid2-perma">
+                      <button className="btn btn-primary super-center" style={{ height: '46px', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} type="submit">
                         {form.id ? <IconByName name='FaRegFloppyDisk' size={24} /> : <IconByName name='FaRegSquarePlus' size={24} /> }
                       </button>
                       {form.id && (
-                        <button className="btn btn-danger" type="button" onClick={resetForm}>
+                        <button className="btn btn-warning super-center" type="button" onClick={resetForm}>
                           <IconByName name='FaXmark' size={24} />
                         </button>
                       )}
@@ -256,13 +318,14 @@ export default function ItemsAdmin() {
 
                 {/* Icon Picker */}
                 <div >
-                  <label className="label">Ikona (FontAwesome)</label>
+                  
                   <div className="grid" style={{ alignItems: 'start' }}>
                     <div style={{ gridColumn: '1 / -1' }}>
                       <IconPicker
                         value={form.icon}
                         onChange={(name: string) => setForm(f => ({ ...f, icon: name }))}
                         placeholder="Hledat (např. coffee, user)…"
+                        favorites={FAVORITE_ICONS}
                       />
                     </div>
                   </div>
@@ -273,64 +336,26 @@ export default function ItemsAdmin() {
             </form>
           </section>
 
-          {/* Toolbar */}
-          <div className="card cardPad" style={{ marginBottom: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            
-              <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-                <div >
-                    <label className="label" htmlFor="filter">Filtr kategorie</label>
-                    <select id="filter" className="input" value={filter} onChange={(e) => setFilter(e.target.value)}>
-                    <option value="">— vše —</option>
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn btn-primary" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
-                    {savingOrder ? 'Ukládám…' : '💾 Uložit pořadí'}
-                </button>
-              </div>
-            
-          </div>
-
           {/* Seznam položek (DRAG & DROP) */}
-          <div className="grid-tiny" onDragOver={onDragOver}>
-            {items.map(item => (
-              <section
-                key={item.id}
-                className="card cardPad drag-card"
-                draggable
-                onDragStart={(e) => onDragStart(e, item.id)}
-                onDrop={(e) => onDrop(e, item.id)}
-              >
-                <header className="receiptHeader" style={{ padding: 0, borderBottom: 'none', alignItems: 'center' }}>
-                  <div className="receiptTitle" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span className="drag-handle" title="Táhni pro změnu pořadí" style={{ cursor: 'grab', display: 'inline-flex', alignItems: 'center' }}>
-                      <Fa.FaGripLines />
-                    </span>
-                    <IconByName name={item.icon} />
-                    <span>#{item.position}</span>
-                    <span>{item.name}</span>
-                  </div>
-                  <div className="totalPrice">{czk.format(item.price || 0)}</div>
-                </header>
-                <div className="muted">Kategorie: <strong>{item.category || 'Ostatní'}</strong></div>
-                <div style={{ marginTop: 12, display: 'flex', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
-                  
-                  <button className="btn" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => edit(item)}><Fa.FaWrench /> Upravit</button>
-                  <button className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} onClick={() => del(item.id)}><Fa.FaTrashCan /> Smazat</button>
+          <div onDragOver={onDragOver}>
+            {groupedItems.map(group => group.items.length > 0 && (
+              <section key={group.name} style={{ marginBottom: '2rem' }}>
+                <h2 className="sectionTitle" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+                  {group.name}
+                </h2>
+                <div className="grid-tiny">
+                  {group.items.map(item => (
+                    <ItemCard key={item.id} item={item} onDragStart={onDragStart} onDrop={onDrop} onEdit={edit} onDelete={del} />
+                  ))}
                 </div>
               </section>
             ))}
           </div>
 
-          <div className="card cardPad" style={{ marginBottom: 16, marginTop: 16, display: 'flex', gap: 12, alignItems: 'end', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <div></div>
-             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-primary" disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
-                {savingOrder ? 'Ukládám…' : '💾 Uložit pořadí'}
-              </button>
-            </div>
+          <div className="card cardPad" style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+            <button className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }} disabled={!dirty || savingOrder} onClick={saveOrder} title={dirty ? 'Uložit nové pořadí' : 'Žádná změna'}>
+              {savingOrder ? 'Ukládám…' : <><Fa.FaFloppyDisk /> Uložit pořadí</>}
+            </button>
           </div>
 
           <style jsx>{`
