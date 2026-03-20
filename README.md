@@ -3,6 +3,8 @@
 A simple cash register application built with **Next.js** + **React**, storing receipts in a **JSON file** (planned migration to SQLite).\
 The project is aimed at easy use in small businesses or as an experimental local POS system.
 
+See V2 branch for feutures towards SQLite and such 🙂
+
 ---
 
 ## ✨ Features
