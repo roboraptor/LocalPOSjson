@@ -1,4 +1,4 @@
-# 🧾 Local POS
+# 🧾 Local POS V2
 
 A simple cash register application built with **Next.js** + **React**, storing receipts in **SQLite** (via better-sqlite3).\
 The project is aimed at easy use in small businesses or as an experimental local POS system.
