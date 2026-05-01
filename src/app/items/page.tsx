@@ -6,26 +6,10 @@ import Link from 'next/link';
 import * as Fa from 'react-icons/fa6';
 import IconPicker from '@/components/IconPicker';
 import { Item } from '@/types/db';
+import FAVORITE_ICONS from '@/data/favoriteIcons.json';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 const CATEGORIES = ['Nápoje', 'Jídlo', 'Ostatní'];
-
-// Seznam oblíbených/často používaných ikon pro rychlejší výběr
-const FAVORITE_ICONS = [
-  'FaCubes',
-  'FaMugSaucer',
-  'FaBeerMugEmpty',
-  'FaWineGlass',
-  'FaGlassWater',
-  'FaUtensils',
-  'FaBurger',
-  'FaPizzaSlice',
-  'FaIceCream',
-  'FaCakeCandles',
-  'FaMoneyBillWave',
-  'FaCreditCard',
-  'FaReceipt',
-];
 
 // Pomocná komponenta pro dynamické ikony
 function IconByName({ name, size = 18 }: { name: string | null | undefined; size?: number }) {
