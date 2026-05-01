@@ -16,6 +16,7 @@ export default function PosPage() {
 
   // --- Košík ---
   const [receipt, setReceipt] = useState<Item[]>([]);
+  const [selectedReceiptItemIdx, setSelectedReceiptItemIdx] = useState<number | null>(null);
   
   // --- Modals State ---
   const [savedModalOpen, setSavedModalOpen] = useState(false);
@@ -50,7 +51,11 @@ export default function PosPage() {
 
   // --- Logika košíku ---
   const addItem = (item: Item) => setReceipt((r) => [...r, item]);
-  const clearReceipt = () => setReceipt([]);
+  const clearReceipt = () => {
+    setReceipt([]);
+    setSelectedReceiptItemIdx(null);
+  };
+  const removeItem = (indexToRemove: number) => setReceipt((r) => r.filter((_, idx) => idx !== indexToRemove));
   
   const total = receipt.reduce((sum, item) => sum + (item.price || 0), 0);
 
@@ -205,9 +210,29 @@ export default function PosPage() {
           ) : (
             <>
               {receipt.map((item, idx) => (
-                <div key={`${item.id}-${idx}`} className="receipt__row">
+                <div 
+                  key={`${item.id}-${idx}`} 
+                  className="receipt__row"
+                  onClick={() => setSelectedReceiptItemIdx(idx === selectedReceiptItemIdx ? null : idx)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <span className="receipt__name">{item.name}</span>
-                  <span className="receipt__price">{czk.format(item.price || 0)}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span className="receipt__price">{czk.format(item.price || 0)}</span>
+                    {selectedReceiptItemIdx === idx && (
+                      <button 
+                        className="btn btn-danger" 
+                        style={{ padding: '6px 10px', height: 'auto', display: 'flex', alignItems: 'center' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeItem(idx);
+                          setSelectedReceiptItemIdx(null);
+                        }}
+                      >
+                        <Fa.FaTrashCan size={18} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
               <div className="receipt__total">
