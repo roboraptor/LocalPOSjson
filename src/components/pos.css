@@ -209,6 +209,7 @@
   position: relative;                            /* umožní absolutní pozicování dětí */
   min-height: var(--item-row);                   /* zachová jednotnou výšku dlaždice */
   padding-right: calc(var(--sp-4) + 48px);       /* rezerva pro ikonu vpravo */
+  overflow: hidden;                              /* zamezí zobrazení ikony mimo okraj tlačítka */
 }
 
 /* Název – levý horní roh */
