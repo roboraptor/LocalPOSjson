@@ -17,9 +17,6 @@ export default function Modal({ open, onClose, title, children }) {
       <div className="modalCard" onClick={(e) => e.stopPropagation()}>
         {title && <div className="modalTitle">{title}</div>}
         <div className="modalBody">{children}</div>
-        <div className="modalActions">
-          <button className="btn btn-ghost" onClick={onClose}>Zavřít</button>
-        </div>
       </div>
     </div>
   );

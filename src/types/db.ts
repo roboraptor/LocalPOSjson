@@ -25,7 +25,7 @@ export interface Tab {
   is_staff: number;
   created_at: string;
   updated_at: string;
-  items: string; // JSON string
+  items: any; // JSON string parsed to Item[]
 }
 
 export interface Receipt {

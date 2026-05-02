@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import * as Fa from 'react-icons/fa6';
 import Modal from '@/components/Modal'; 
-import { Item, Category } from '@/types/db';
+import { Item, Category, Tab } from '@/types/db';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
@@ -12,11 +12,13 @@ export default function PosPage() {
   // --- Data ---
   const [items, setItems] = useState<Item[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [tabsList, setTabsList] = useState<Tab[]>([]);
   const [loading, setLoading] = useState(true);
 
   // --- Košík ---
   const [receipt, setReceipt] = useState<Item[]>([]);
   const [selectedReceiptItemIdx, setSelectedReceiptItemIdx] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab | null>(null);
   
   // --- Modals State ---
   const [savedModalOpen, setSavedModalOpen] = useState(false);
@@ -27,26 +29,30 @@ export default function PosPage() {
   const [customPrice, setCustomPrice] = useState('');
 
   const [showNameModal, setShowNameModal] = useState(false);
-  const [issuedTo, setIssuedTo] = useState('');
-
+  const [showTableModal, setShowTableModal] = useState(false);
+  const [tabInputName, setTabInputName] = useState('');
+  
   // --- Načtení dat při startu ---
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [itemsRes, catsRes] = await Promise.all([
-          fetch('/api/items'),
-          fetch('/api/categories')
-        ]);
+  const fetchAllData = async () => {
+    try {
+      const [itemsRes, catsRes, tabsRes] = await Promise.all([
+        fetch('/api/items'),
+        fetch('/api/categories'),
+        fetch('/api/tabs')
+      ]);
 
-        if (itemsRes.ok) setItems(await itemsRes.json());
-        if (catsRes.ok) setCategories(await catsRes.json());
-      } catch (error) {
-        console.error('Chyba načítání dat:', error);
-      } finally {
-        setLoading(false);
-      }
+      if (itemsRes.ok) setItems(await itemsRes.json());
+      if (catsRes.ok) setCategories(await catsRes.json());
+      if (tabsRes.ok) setTabsList(await tabsRes.json());
+    } catch (error) {
+      console.error('Chyba načítání dat:', error);
+    } finally {
+      setLoading(false);
     }
-    fetchData();
+  };
+
+  useEffect(() => {
+    fetchAllData();
   }, []);
 
   // --- Logika košíku ---
@@ -54,6 +60,7 @@ export default function PosPage() {
   const clearReceipt = () => {
     setReceipt([]);
     setSelectedReceiptItemIdx(null);
+    setActiveTab(null);
   };
   const removeItem = (indexToRemove: number) => setReceipt((r) => r.filter((_, idx) => idx !== indexToRemove));
   
@@ -84,26 +91,108 @@ export default function PosPage() {
     setShowCustomModal(false);
   };
 
-  // --- Uložení účtenky ---
+  // --- Tab / Table Logic ---
+  const handleSelectTab = async (tab: Tab) => {
+    // Pokud máme něco v košíku, tak to přidáme k tabu a uložíme (Odložíme)
+    if (receipt.length > 0) {
+      const mergedItems = [...tab.items, ...receipt];
+      await handleSaveTab(tab.id, mergedItems);
+    } else {
+      // Jinak tab načteme k úpravě
+      setActiveTab(tab);
+      setReceipt(tab.items);
+    }
+    setShowNameModal(false);
+    setShowTableModal(false);
+  };
+
+  const handleCreateNewTab = async (isTable: boolean, forcedName?: string) => {
+    const name = (forcedName || tabInputName).trim();
+    if (!name) return alert('Zadej název.');
+    
+    try {
+      const res = await fetch('/api/tabs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          is_permanent: isTable ? 1 : 0,
+          is_table: isTable,
+          is_staff: false,
+          items: receipt // uloží se rovnou i s aktuálním košíkem, ať je prázdný nebo ne
+        })
+      });
+      if (!res.ok) throw new Error('Chyba při ukládání tabu.');
+      
+      await fetchAllData();
+      clearReceipt();
+      setShowNameModal(false);
+      setShowTableModal(false);
+      setTabInputName('');
+    } catch (e: any) {
+      alert(e.message || 'Chyba');
+    }
+  };
+
+  const handleSaveTab = async (id?: number, itemsToSave?: Item[]) => {
+    const tabId = id || activeTab?.id;
+    if (!tabId) return;
+
+    try {
+      const res = await fetch('/api/tabs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: tabId,
+          items: itemsToSave || receipt
+        })
+      });
+      if (!res.ok) throw new Error('Chyba při aktualizaci tabu.');
+      
+      await fetchAllData();
+      clearReceipt();
+    } catch (e: any) {
+      alert(e.message || 'Chyba');
+    }
+  };
+
+  // --- Uložení účtenky (Checkout) ---
   const saveReceipt = async () => {
     if (receipt.length === 0) return alert('Účtenka je prázdná.');
 
     try {
-      // Používáme nový endpoint pro účtenky
-      const res = await fetch('/api/receipts', { // Dříve /api/save
+      const res = await fetch('/api/receipts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           receipt,
-          issued_to: issuedTo.trim() || null
+          issued_to: activeTab ? activeTab.name : null
         })
       });
 
       if (!res.ok) throw new Error('Chyba při ukládání.');
 
-      // Úspěch -> vyčistit a ukázat potvrzení
+      // Pokud platíme tab, vymažeme ho (nebo vyprázdníme stůl)
+      if (activeTab) {
+        if (activeTab.is_table) {
+          // Stůl se nemaže, jen vyprázdní
+          await fetch('/api/tabs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: activeTab.id, items: [] })
+          });
+        } else {
+          // Obyčejný účet se smaže
+          await fetch('/api/tabs', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: activeTab.id })
+          });
+        }
+      }
+
+      await fetchAllData();
       clearReceipt();
-      setIssuedTo('');
       
       setSavedModalOpen(true);
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
@@ -178,18 +267,26 @@ export default function PosPage() {
             </button>
             <button className="btn btn-warning btn-items--tri" onClick={() => setShowNameModal(true)}>
               <div className="btn-items__title">Na účet</div>
-              {issuedTo && <p className="muted" style={{ marginTop: 20, fontSize: '0.8em' }}>{issuedTo}</p>}
               <div className="btn-items__icon"><Fa.FaUser /></div>
+            </button>
+            <button className="btn btn-warning btn-items--tri" onClick={() => setShowTableModal(true)}>
+              <div className="btn-items__title">Na stůl</div>
+              <div className="btn-items__icon"><Fa.FaChair /></div>
             </button>
           </div>
 
           <h2 className="sectionTitle">Akce</h2>
           <div className="grid" style={{ marginTop: 10 }}>
+            {activeTab && (
+              <button className="btn btn-info" onClick={() => handleSaveTab()}>
+                Odložit
+              </button>
+            )}
             <button className="btn btn-primary" onClick={saveReceipt} disabled={receipt.length === 0}>
-              Uložit účtenku
+              {activeTab ? 'Zaplatit účtenku' : 'Zaplatit'}
             </button>
-            <button className="btn btn-danger" onClick={clearReceipt} disabled={receipt.length === 0}>
-              Vyprázdnit
+            <button className="btn btn-danger" onClick={clearReceipt} disabled={receipt.length === 0 && !activeTab}>
+              {activeTab ? 'Zrušit' : 'Vyprázdnit'}
             </button>
           </div>
         </div>
@@ -198,12 +295,7 @@ export default function PosPage() {
       {/* Pravý sloupec - Účtenka */}
       <aside className="receiptColumn">
         <div className="receipt">
-          <h3 className="receipt__title">Účtenka</h3>
-          {issuedTo && (
-            <div className="receipt__meta">
-              Pro: {issuedTo}
-            </div>
-          )}
+          <h3 className="receipt__title">Účtenka {activeTab && `(${activeTab.is_table ? 'Stůl' : 'Účet'}: ${activeTab.name})`}</h3>
           
           {receipt.length === 0 ? (
             <p className="muted">Zatím prázdná.</p>
@@ -260,14 +352,54 @@ export default function PosPage() {
         </div>
       </Modal>
 
-      <Modal open={showNameModal} onClose={() => setShowNameModal(false)} title="Jméno zákazníka">
+      <Modal open={showNameModal} onClose={() => setShowNameModal(false)} title="Na Účet">
         <div className="formRow">
-          <label className="label">Jméno / ID</label>
-          <input className="input" autoFocus value={issuedTo} onChange={e => setIssuedTo(e.target.value)} />
+          <label className="label">Nový účet (Jméno)</label>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <input className="input" autoFocus value={tabInputName} onChange={e => setTabInputName(e.target.value)} placeholder="např. Karel..." />
+            <button className="btn btn-success" onClick={() => handleCreateNewTab(false)}>Vytvořit</button>
+          </div>
         </div>
-        <div className="modalActions">
-          <button className="btn btn-success" onClick={() => setShowNameModal(false)}>Nastavit</button>
-          <button className="btn btn-ghost" onClick={() => { setIssuedTo(''); setShowNameModal(false); }}>Zrušit</button>
+        
+        {tabsList.filter(t => !t.is_table).length > 0 && (
+          <div style={{ marginTop: '20px' }}>
+            <h4 style={{ marginBottom: '10px' }}>Otevřené účty:</h4>
+            <div className="grid-tiny" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))' }}>
+              {tabsList.filter(t => !t.is_table).map(tab => (
+                <button key={tab.id} className="btn btn-warning" onClick={() => handleSelectTab(tab)} style={{ height: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <strong>{tab.name}</strong>
+                  <small>{czk.format(tab.items.reduce((acc: number, i: Item) => acc + (i.price || 0), 0))}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="modalActions" style={{ marginTop: '20px' }}>
+          <button className="btn btn-ghost" onClick={() => { setTabInputName(''); setShowNameModal(false); }}>Zavřít</button>
+        </div>
+      </Modal>
+
+      <Modal open={showTableModal} onClose={() => setShowTableModal(false)} title="Na Stůl">
+        {tabsList.filter(t => t.is_table).length > 0 ? (
+          <div>
+            <h4 style={{ marginBottom: '10px' }}>Výběr stolu:</h4>
+            <div className="grid-tiny" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))' }}>
+              {tabsList.filter(t => t.is_table).map(tab => {
+                const total = tab.items.reduce((acc: number, i: Item) => acc + (i.price || 0), 0);
+                return (
+                  <button key={tab.id} className={`btn ${total > 0 ? 'btn-danger' : 'btn-success'}`} onClick={() => handleSelectTab(tab)} style={{ height: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <strong>{tab.name}</strong>
+                    {total > 0 ? <small>{czk.format(total)}</small> : <small>Volný</small>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <p className="muted">Zatím nejsou vytvořeny žádné stoly. Lze je přidat v administraci stolů.</p>
+        )}
+        <div className="modalActions" style={{ marginTop: '20px' }}>
+          <button className="btn btn-ghost" onClick={() => { setTabInputName(''); setShowTableModal(false); }}>Zavřít</button>
         </div>
       </Modal>
 
