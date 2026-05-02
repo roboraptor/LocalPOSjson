@@ -3,24 +3,41 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { Category } from '@/types/db';
 import * as Fa from 'react-icons/fa6';
+import IconPicker from '@/components/IconPicker';
+import FAVORITE_ICONS from '@/data/favoriteIcons.json';
+
+function IconByName({ name, size = 18 }: { name: string | null | undefined; size?: number }) {
+  const iconName = name as keyof typeof Fa;
+  const Comp = (name && Fa[iconName]) ? Fa[iconName] : Fa.FaRegSquare;
+  return <Comp size={size} />;
+}
 
 export default function CategoriesSettings() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [favoriteIcons, setFavoriteIcons] = useState<string[]>(FAVORITE_ICONS);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState<{ id: number | null; name: string; color: string; position: number | string }>({
+  const [form, setForm] = useState<{ id: number | null; name: string; color: string; position: number | string; icon: string }>({
     id: null,
     name: '',
     color: '#ffffff',
     position: '',
+    icon: 'FaFolder',
   });
 
   const loadCategories = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/categories');
-      if (!res.ok) throw new Error('Failed to fetch categories');
-      const data = await res.json();
-      setCategories(data);
+      const [resCats, resIcons] = await Promise.all([
+        fetch('/api/categories'),
+        fetch('/api/icons')
+      ]);
+      if (!resCats.ok) throw new Error('Failed to fetch categories');
+      setCategories(await resCats.json());
+      
+      if (resIcons.ok) {
+        const iconsData = await resIcons.json();
+        if (Array.isArray(iconsData)) setFavoriteIcons(iconsData);
+      }
     } catch (error) {
       console.error(error);
       // alert('Error loading categories'); // volitelně tiché selhání
@@ -93,7 +110,7 @@ export default function CategoriesSettings() {
       <div className="card-body">
         <div className="row">
           <div className="col-md-7">
-            <h6>Existující kategorie</h6>
+            <h6 className="mb-3 ">Existující kategorie:</h6>
             {loading ? (
               <>
                 <div className="card skeleton"></div>
@@ -132,7 +149,7 @@ export default function CategoriesSettings() {
             )}
           </div>
           <div className="col-md-5">
-            <div className="p-3 bg-light rounded border">
+            <div className="p-3 rounded border">
                 <h6 className="mb-3">{form.id ? 'Upravit kategorii' : 'Nová kategorie'}</h6>
                 <form onSubmit={handleSubmit}>
                 <div className="mb-2">
@@ -149,6 +166,21 @@ export default function CategoriesSettings() {
                         <input type="number" className="form-control" id="catPos" value={form.position} onChange={e => setForm(f => ({ ...f, position: e.target.value }))} />
                     </div>
                 </div>
+                
+                <div className="mb-3">
+                  <label className="form-label small fw-bold">Ikona</label>
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <div style={{ width: 32, textAlign: 'center' }}><IconByName name={form.icon} size={24} /></div>
+                    <code className="text-muted">{form.icon || '—'}</code>
+                  </div>
+                  <IconPicker 
+                    value={form.icon} 
+                    onChange={(name) => setForm(f => ({ ...f, icon: name }))} 
+                    placeholder="Hledat ikonu..."
+                    favorites={favoriteIcons}
+                  />
+                </div>
+
                 <div className="d-grid gap-2 mt-3">
                     <button type="submit" className="btn btn-primary">{form.id ? 'Uložit změny' : 'Přidat'}</button>
                     {form.id && <button type="button" className="btn btn-secondary" onClick={() => setForm({ id: null, name: '', color: '#ffffff', position: '' })}>Zrušit</button>}

@@ -4,6 +4,8 @@ import Link from 'next/link';
 
 import CategoriesSettings from '@/components/settings/CategoriesSettings';
 import GeneralSettings from '@/components/settings/GeneralSettings';
+import IconsSettings from '@/components/settings/IconsSettings';
+import TablesSettings from '@/components/settings/TablesSettings';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('general');
@@ -27,6 +29,18 @@ export default function SettingsPage() {
             >
               🏢 Kategorie
             </button>
+            <button 
+              className={`list-group-item list-group-item-action ${activeTab === 'icons' ? 'active' : ''}`}
+              onClick={() => setActiveTab('icons')}
+            >
+              ⭐ Ikony
+            </button>
+            <button 
+              className={`list-group-item list-group-item-action ${activeTab === 'tables' ? 'active' : ''}`}
+              onClick={() => setActiveTab('tables')}
+            >
+              🪑 Stoly a Účty
+            </button>
           </div>
         </div>
 
@@ -34,6 +48,8 @@ export default function SettingsPage() {
           <div className="card shadow-sm border-0"></div>
             {activeTab === 'general' && <GeneralSettings />}
             {activeTab === 'categories' && <CategoriesSettings />}
+            {activeTab === 'icons' && <IconsSettings />}
+            {activeTab === 'tables' && <TablesSettings />}
           </div>
       </div>
     

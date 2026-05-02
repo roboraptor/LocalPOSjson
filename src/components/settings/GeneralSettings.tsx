@@ -119,7 +119,7 @@ export default function GeneralSettings() {
           </div>
 
           <hr />
-          <h6 className="mb-3 text-muted">Vzhled účtenky</h6>
+          <h6 className="mb-3 text-mute">Vzhled účtenky</h6>
 
           <div className="row mb-3">
              <div className="col-md-8">
@@ -153,7 +153,7 @@ export default function GeneralSettings() {
           </div>
 
           <hr />
-          <h6 className="mb-3 text-muted">Fakturační údaje (volitelné)</h6>
+          <h6 className="mb-3 text-mute">Fakturační údaje (volitelné)</h6>
           
           <div className="row">
             <div className="col-md-6 mb-3">

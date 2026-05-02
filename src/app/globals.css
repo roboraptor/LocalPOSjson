@@ -95,6 +95,15 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   font-weight: 700;
 }
 
+.card-body {
+  padding: var(--sp-4);
+  color: var(--fg);
+}
+
+.text-mute {
+  color: var(--muted);
+}
+
 .container {
   max-width: 1400px;
 }

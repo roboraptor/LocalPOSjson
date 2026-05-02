@@ -48,6 +48,7 @@ function ItemCard({ item, onDragStart, onDrop, onEdit, onDelete }: {
 
 export default function ItemsAdmin() {
   const [items, setItems] = useState<Item[]>([]);
+  const [favoriteIcons, setFavoriteIcons] = useState<string[]>(FAVORITE_ICONS);
   const [loading, setLoading] = useState(true);
   const [savingOrder, setSavingOrder] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -68,9 +69,18 @@ export default function ItemsAdmin() {
   const load = async () => {
     setLoading(true); setErr(null);
     try {
-      const res = await fetch('/api/items', { cache: 'no-store' });
-      if (!res.ok) throw new Error('Nepodařilo se načíst položky.');
-      const data: Item[] = await res.json();
+      const [itemsRes, iconsRes] = await Promise.all([
+        fetch('/api/items', { cache: 'no-store' }),
+        fetch('/api/icons', { cache: 'no-store' }) // Načteme dynamické ikony z API
+      ]);
+
+      if (!itemsRes.ok) throw new Error('Nepodařilo se načíst položky.');
+      const data: Item[] = await itemsRes.json();
+      
+      if (iconsRes.ok) {
+        const iconsData = await iconsRes.json();
+        if (Array.isArray(iconsData)) setFavoriteIcons(iconsData);
+      }
 
       // Normalizace position + seřazení
       const withPos = (Array.isArray(data) ? data : []).map((it, idx) => ({
@@ -309,7 +319,7 @@ export default function ItemsAdmin() {
                         value={form.icon}
                         onChange={(name: string) => setForm(f => ({ ...f, icon: name }))}
                         placeholder="Hledat (např. coffee, user)…"
-                        favorites={FAVORITE_ICONS}
+                        favorites={favoriteIcons}
                       />
                     </div>
                   </div>
