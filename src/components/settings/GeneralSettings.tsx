@@ -11,6 +11,7 @@ export default function GeneralSettings() {
     organization_owner: '',
     organization_id: '',
     organization_vat_id: '',
+    bank_account_number: '',
     tax_rate: 21,
     tax_enabled: false,
     currency: 'CZK',
@@ -84,6 +85,7 @@ export default function GeneralSettings() {
       </div>
       <div className="card-body">
         <form onSubmit={handleSubmit}>
+          <h6 className="mb-3 text-mute">Organizace</h6>
           <div className="row">
             <div className="col-md-6 mb-3">
               <label className="form-label fw-bold">Název organizace</label>
@@ -107,54 +109,6 @@ export default function GeneralSettings() {
             </div>
           </div>
 
-          <div className="mb-3">
-            <label className="form-label fw-bold">Adresa provozovny</label>
-            <textarea 
-                className="form-control" 
-                rows={3}
-                name="organization_address"
-                value={formData.organization_address || ''} 
-                onChange={handleChange} 
-            ></textarea>
-          </div>
-
-          <hr />
-          <h6 className="mb-3 text-mute">Vzhled účtenky</h6>
-
-          <div className="row mb-3">
-             <div className="col-md-8">
-                <label className="form-label fw-bold">Nadpis účtenky</label>
-                <input 
-                    type="text" 
-                    className="form-control" 
-                    name="receipt_title"
-                    value={formData.receipt_title || ''} 
-                    onChange={handleChange} 
-                    placeholder="např. 'Účtenka' nebo 'Daňový doklad'"
-                />
-             </div>
-          </div>
-
-          <div className="row mb-3">
-            <div className="col-md-6">
-                <div className="form-check form-switch mb-2">
-                    <input className="form-check-input" type="checkbox" id="headerEnabled" name="receipt_header_enabled" checked={formData.receipt_header_enabled} onChange={handleChange} />
-                    <label className="form-check-label fw-bold" htmlFor="headerEnabled">Hlavička</label>
-                </div>
-                <textarea className="form-control" rows={2} name="receipt_header" value={formData.receipt_header || ''} onChange={handleChange} placeholder="Text v hlavičce..." disabled={!formData.receipt_header_enabled}></textarea>
-            </div>
-            <div className="col-md-6">
-                <div className="form-check form-switch mb-2">
-                    <input className="form-check-input" type="checkbox" id="footerEnabled" name="receipt_footer_enabled" checked={formData.receipt_footer_enabled} onChange={handleChange} />
-                    <label className="form-check-label fw-bold" htmlFor="footerEnabled">Patička</label>
-                </div>
-                <textarea className="form-control" rows={2} name="receipt_footer" value={formData.receipt_footer || ''} onChange={handleChange} placeholder="Text v patičce..." disabled={!formData.receipt_footer_enabled}></textarea>
-            </div>
-          </div>
-
-          <hr />
-          <h6 className="mb-3 text-mute">Fakturační údaje (volitelné)</h6>
-          
           <div className="row">
             <div className="col-md-6 mb-3">
                 <label className="form-label">IČO</label>
@@ -178,8 +132,34 @@ export default function GeneralSettings() {
             </div>
           </div>
 
-          <div className="row align-items-center">
-            <div className="col-auto">
+          <div className="mb-3">
+            <label className="form-label fw-bold">Adresa provozovny</label>
+            <textarea 
+                className="form-control" 
+                rows={3}
+                name="organization_address"
+                value={formData.organization_address || ''} 
+                onChange={handleChange} 
+            ></textarea>
+          </div>
+
+          <hr />
+          <h6 className="mb-3 text-mute">Vzhled účtenky</h6>
+
+          <div className="row mb-3">
+             <div className="col-md-6">
+                <label className="form-label fw-bold">Nadpis účtenky</label>
+                <input 
+                    type="text" 
+                    className="form-control" 
+                    name="receipt_title"
+                    value={formData.receipt_title || ''} 
+                    onChange={handleChange} 
+                    placeholder="např. 'Účtenka' nebo 'Daňový doklad'"
+                />
+             </div>
+
+             <div className="col-auto mb-3">
                 <label className="form-label">Měna</label>
                 <input 
                     type="text" 
@@ -190,33 +170,72 @@ export default function GeneralSettings() {
                     onChange={handleChange}
                 />
             </div>
-            <div className="col-auto">
-                 <div className="form-check form-switch">
-                    <input 
-                        className="form-check-input" 
-                        type="checkbox" 
-                        id="taxEnabled"
-                        name="tax_enabled"
-                        checked={formData.tax_enabled} 
-                        onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="taxEnabled">Plátce DPH</label>
-                 </div>
+            <div className="col-auto mb-3">
+              <label className="form-check-label" htmlFor="taxEnabled">Plátce DPH</label>
+              <div className="form-check form-switch mt-3">
+                <input 
+                    className="form-check-input" 
+                    type="checkbox" 
+                    id="taxEnabled"
+                    name="tax_enabled"
+                    checked={formData.tax_enabled} 
+                    onChange={handleChange}
+                />
+                
+              </div>
             </div>
-            <div className="col-auto">
-                <div className="input-group input-group-sm">
-                    <span className="input-group-text">Sazba DPH %</span>
+
+            <div className="col-auto mb-3">
+              <label className="form-label">Sazba DPH</label>
+
                     <input 
                         type="number" 
-                        className="input form-control" 
+                        className="form-control" 
                         name="tax_rate"
                         style={{ maxWidth: 80 }}
                         value={formData.tax_rate} 
                         onChange={handleChange}
                         disabled={!formData.tax_enabled}
                     />
-                </div>
             </div>
+
+          </div>
+
+          <div className="row mb-3">
+            <div className="col-md-6">
+                <div className="form-check form-switch mb-2">
+                    <input className="form-check-input" type="checkbox" id="headerEnabled" name="receipt_header_enabled" checked={formData.receipt_header_enabled} onChange={handleChange} />
+                    <label className="form-check-label fw-bold" htmlFor="headerEnabled">Hlavička</label>
+                </div>
+                <textarea className="form-control" rows={2} name="receipt_header" value={formData.receipt_header || ''} onChange={handleChange} placeholder="Text v hlavičce..." disabled={!formData.receipt_header_enabled}></textarea>
+            </div>
+            <div className="col-md-6">
+                <div className="form-check form-switch mb-2">
+                    <input className="form-check-input" type="checkbox" id="footerEnabled" name="receipt_footer_enabled" checked={formData.receipt_footer_enabled} onChange={handleChange} />
+                    <label className="form-check-label fw-bold" htmlFor="footerEnabled">Patička</label>
+                </div>
+                <textarea className="form-control" rows={2} name="receipt_footer" value={formData.receipt_footer || ''} onChange={handleChange} placeholder="Text v patičce..." disabled={!formData.receipt_footer_enabled}></textarea>
+            </div>
+          </div>
+
+          <hr />
+          <h6 className="mb-3 text-mute">Platební údaje (volitelné pro QR)</h6>
+
+          <div className="row align-items-center">
+
+            <div className="col-md-6 mb-3">
+              <label className="form-label fw-bold">Číslo bankovního účtu</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                name="bank_account_number"
+                value={formData.bank_account_number || ''} 
+                onChange={handleChange} 
+              />
+            </div>
+
+            
+            
           </div>
 
           <div className="mt-4">

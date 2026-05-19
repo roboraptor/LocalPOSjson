@@ -34,3 +34,20 @@ export interface Receipt {
   issued_to: string | null;
   items: string; // JSON string
 }
+
+export interface GeneralSettings {
+  organization_name: string;
+  organization_address: string;
+  organization_owner: string;
+  currency: string;
+  organization_id: string;
+  bank_account_number: string | null;
+  tax_rate: number;
+  organization_vat_id: string;
+  tax_enabled: number;
+  receipt_title: string | null;
+  receipt_header: string | null;
+  receipt_header_enabled: number;
+  receipt_footer: string | null;
+  receipt_footer_enabled: number;
+}

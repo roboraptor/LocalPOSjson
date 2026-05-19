@@ -21,6 +21,7 @@ db.exec(`
     organization_owner TEXT,
     currency TEXT DEFAULT 'CZK',
     organization_id TEXT,
+    bank_account_number TEXT,
     tax_rate REAL DEFAULT 21.0,
     organization_vat_id TEXT,
     tax_enabled INTEGER DEFAULT 0,
