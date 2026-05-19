@@ -123,7 +123,7 @@ export default function IconsSettings() {
 
         <div>
             <h6 className="mb-3 text-mute">Přidat novou ikonu:</h6>
-            <div style={{ maxWidth: '400px' }}>
+            <div style={{ maxWidth: '900px' }}>
             <IconPicker 
                 value={newIcon} 
                 onChange={(name) => setNewIcon(name)} 

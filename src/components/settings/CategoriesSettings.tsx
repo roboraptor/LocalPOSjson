@@ -68,7 +68,7 @@ export default function CategoriesSettings() {
             const errorData = await res.json();
             throw new Error(errorData.error || 'Operation failed');
         }
-        setForm({ id: null, name: '', color: '#ffffff', position: '' });
+        setForm({ id: null, name: '', color: '#ffffff', position: '', icon: 'FaFolder' });
         await loadCategories();
     } catch (error: any) {
         alert(`Error: ${error.message}`);
@@ -99,6 +99,7 @@ export default function CategoriesSettings() {
         name: category.name,
         color: category.color || '#ffffff',
         position: category.position,
+        icon: category.icon || 'FaFolder',
     });
   };
 
@@ -120,6 +121,7 @@ export default function CategoriesSettings() {
               <table className="table table-striped table-hover align-middle">
                 <thead>
                   <tr>
+                    <th>Ikona</th>
                     <th>Název</th>
                     <th>Barva</th>
                     <th>#</th>
@@ -129,6 +131,7 @@ export default function CategoriesSettings() {
                 <tbody>
                   {categories.map(cat => (
                     <tr key={cat.id}>
+                      <td className="text-center" style={{ width: 40 }}><IconByName name={cat.icon} /></td>
                       <td>{cat.name}</td>
                       <td>
                         <span style={{ backgroundColor: cat.color || 'transparent', padding: '2px 8px', borderRadius: '4px', border: '1px solid #ccc', display: 'inline-block', minWidth: 30 }}>
@@ -183,7 +186,7 @@ export default function CategoriesSettings() {
 
                 <div className="d-grid gap-2 mt-3">
                     <button type="submit" className="btn btn-primary">{form.id ? 'Uložit změny' : 'Přidat'}</button>
-                    {form.id && <button type="button" className="btn btn-secondary" onClick={() => setForm({ id: null, name: '', color: '#ffffff', position: '' })}>Zrušit</button>}
+                    {form.id && <button type="button" className="btn btn-secondary" onClick={() => setForm({ id: null, name: '', color: '#ffffff', position: '', icon: 'FaFolder' })}>Zrušit</button>}
                 </div>
                 </form>
             </div>

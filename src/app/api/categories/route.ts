@@ -14,13 +14,13 @@ export async function GET() {
 // POST - Vytvořit novou kategorii
 export async function POST(req: Request) {
     try {
-        const { name, color, position } = await req.json();
+        const { name, color, icon, position } = await req.json();
         if (!name) {
             return NextResponse.json({ error: 'Název je povinný' }, { status: 400 });
         }
-        const stmt = db.prepare('INSERT INTO categories (name, color, position) VALUES (?, ?, ?)');
-        const info = stmt.run(name, color, position || 0);
-        return NextResponse.json({ id: info.lastInsertRowid, name, color, position }, { status: 201 });
+        const stmt = db.prepare('INSERT INTO categories (name, color, icon, position) VALUES (?, ?, ?, ?)');
+        const info = stmt.run(name, color, icon, position || 0);
+        return NextResponse.json({ id: info.lastInsertRowid, name, color, icon, position }, { status: 201 });
     } catch (error: any) {
         if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
             return NextResponse.json({ error: 'Kategorie s tímto názvem již existuje.' }, { status: 409 });
@@ -32,12 +32,12 @@ export async function POST(req: Request) {
 // PUT - Upravit kategorii
 export async function PUT(req: Request) {
     try {
-        const { id, name, color, position } = await req.json();
+        const { id, name, color, icon, position } = await req.json();
         if (!id || !name) {
             return NextResponse.json({ error: 'ID a název jsou povinné' }, { status: 400 });
         }
-        const stmt = db.prepare('UPDATE categories SET name = ?, color = ?, position = ? WHERE id = ?');
-        const info = stmt.run(name, color, position || 0, id);
+        const stmt = db.prepare('UPDATE categories SET name = ?, color = ?, icon = ?, position = ? WHERE id = ?');
+        const info = stmt.run(name, color, icon, position || 0, id);
         if (info.changes === 0) {
             return NextResponse.json({ error: 'Kategorie nenalezena' }, { status: 404 });
         }
