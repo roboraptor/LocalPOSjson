@@ -2,10 +2,19 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { Tab } from './types/db'; // Import typů, které jsme vytvořili výše
-import dbConfig from './data/dbposition.json';
 
-// Ensure the database file is stored in the configured directory
-const dbPath = path.resolve(process.cwd(), dbConfig.dbPath);
+// Helper to get the current configured path
+export function getDbPath() {
+  const configPath = path.join(process.cwd(), 'src', 'data', 'dbposition.json');
+  try {
+    const configContent = fs.readFileSync(configPath, 'utf8');
+    const dbConfigPath = JSON.parse(configContent).dbPath;
+    return path.resolve(process.cwd(), dbConfigPath);
+  } catch (e) {
+    console.warn('Could not read dbposition.json, using default path: data/pos.db');
+    return path.resolve(process.cwd(), 'data/pos.db');
+  }
+}
 
 // Create .env from .env.example if it doesn't exist
 const envPath = path.resolve(process.cwd(), '.env');
@@ -15,16 +24,27 @@ if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
 }
 
 let db: any;
+let currentDbPath: string | null = null;
 
 export function getDb() {
+  const expectedPath = getDbPath();
+  
+  // If the path changed, close the old connection and reconnect
+  if (db && currentDbPath !== expectedPath) {
+    console.log(`Database path changed from ${currentDbPath} to ${expectedPath}. Reconnecting...`);
+    db.close();
+    db = null;
+  }
+
   if (!db) {
-    const dbDir = path.dirname(dbPath);
+    const dbDir = path.dirname(expectedPath);
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
     }
-    db = new Database(dbPath);
+    db = new Database(expectedPath);
     // Enable Write-Ahead Logging for better concurrency/performance
     db.pragma('journal_mode = DELETE');
+    currentDbPath = expectedPath;
   }
   return db;
 }
@@ -131,38 +151,50 @@ export function initDb() {
   return database;
 }
 
+// Vracíme Proxy, aby "import db from '@/db'" vždy používalo aktuální instanci z getDb()
+const dbProxy = new Proxy({} as any, {
+  get: (_, prop) => {
+    const database = getDb();
+    if (!database) throw new Error("Database not initialized");
+    return typeof database[prop] === 'function' ? database[prop].bind(database) : database[prop];
+  }
+});
+
 // Initial call - wrap in try-catch to prevent app crash if DB fails to init
-let databaseInstance: any;
 try {
-  databaseInstance = getDb();
   initDb();
 } catch (error) {
   console.error('Failed to initialize database:', error);
 }
 
-export default databaseInstance;
+export default dbProxy;
 
 // Metoda pro "defragmentaci" ID tabů (srovná je 1, 2, 3... po smazání starých)
 // POZOR: Nepoužívat, pokud je zrovna někdo připojený a markuje, změní mu to ID pod rukama!
-export const reindexTabs = databaseInstance?.transaction((tabsList?: Tab[]) => {
-  // 1. Načíst existující taby (seřadíme: Stoly -> Permanentní -> Ostatní dle času) pokud nejsou předány
-  const currentTabs = tabsList || databaseInstance.prepare(`
-    SELECT * FROM tabs 
-    ORDER BY is_table DESC, is_permanent DESC, created_at ASC
-  `).all() as Tab[];
+export const reindexTabs = (tabsList?: Tab[]) => {
+  const database = getDb();
+  if (!database) return;
+  
+  return database.transaction((tabsListInner?: Tab[]) => {
+    // 1. Načíst existující taby (seřadíme: Stoly -> Permanentní -> Ostatní dle času) pokud nejsou předány
+    const currentTabs = tabsListInner || database.prepare(`
+      SELECT * FROM tabs 
+      ORDER BY is_table DESC, is_permanent DESC, created_at ASC
+    `).all() as Tab[];
 
-  // 2. Smazat tabulku a resetovat autoincrement počítadlo
-  databaseInstance.prepare('DELETE FROM tabs').run();
-  databaseInstance.prepare("DELETE FROM sqlite_sequence WHERE name = 'tabs'").run();
+    // 2. Smazat tabulku a resetovat autoincrement počítadlo
+    database.prepare('DELETE FROM tabs').run();
+    database.prepare("DELETE FROM sqlite_sequence WHERE name = 'tabs'").run();
 
-  // 3. Vložit zpátky s novými ID
-  const insert = databaseInstance.prepare(`
-    INSERT INTO tabs (id, name, is_permanent, is_table, created_at, updated_at, items) 
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `);
+    // 3. Vložit zpátky s novými ID
+    const insert = database.prepare(`
+      INSERT INTO tabs (id, name, is_permanent, is_table, created_at, updated_at, items) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
 
-  let nextId = 1;
-  for (const t of currentTabs) {
-    insert.run(nextId++, t.name, t.is_permanent, t.is_table, t.created_at, t.updated_at, t.items);
-  }
-});
+    let nextId = 1;
+    for (const t of currentTabs) {
+      insert.run(nextId++, t.name, t.is_permanent, t.is_table, t.created_at, t.updated_at, t.items);
+    }
+  })(tabsList);
+};

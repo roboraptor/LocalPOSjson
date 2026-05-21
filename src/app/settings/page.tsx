@@ -109,7 +109,7 @@ export default function SettingsPage() {
       <div className="row">
         <div className="col-md-3">
           <div className="shadow-sm border-0 list-group mb-4">
-            <div className="list-group-item bg-light small fw-bold text-uppercase text-muted py-2">Správa obchodu</div>
+            <div className="list-group-item small fw-bold text-uppercase text-mute py-2">Správa obchodu</div>
             <button 
               className={`list-group-item list-group-item-action border-start-0 border-end-0 ${activeTab === 'categories' ? 'active' : ''}`}
               onClick={() => setActiveTab('categories')}
@@ -129,7 +129,7 @@ export default function SettingsPage() {
               ⭐ Ikony
             </button>
 
-            <div className="list-group-item bg-light small fw-bold text-uppercase text-muted py-2 mt-3">Organizace a Provoz</div>
+            <div className="list-group-item small fw-bold text-uppercase text-mute py-2 mt-3">Organizace a Provoz</div>
             <button 
               className={`list-group-item list-group-item-action border-start-0 border-end-0 ${activeTab === 'org_info' ? 'active' : ''}`}
               onClick={() => setActiveTab('org_info')}
@@ -155,7 +155,7 @@ export default function SettingsPage() {
               📡 Evidence tržeb (EET)
             </button>
 
-            <div className="list-group-item bg-light small fw-bold text-uppercase text-muted py-2 mt-3">Aplikace</div>
+            <div className="list-group-item small fw-bold text-uppercase text-mute py-2 mt-3">Aplikace</div>
             <button 
               className={`list-group-item list-group-item-action border-start-0 border-end-0 ${activeTab === 'db_settings' ? 'active' : ''}`}
               onClick={() => setActiveTab('db_settings')}

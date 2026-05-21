@@ -179,7 +179,7 @@ export default function PaymentSettings() {
               </div>
               <div className="col">
                 <div className="mb-2">
-                  <label className="small fw-bold text-muted d-block">SPAYD Řetězec:</label>
+                  <label className="small fw-bold text-mute d-block">SPAYD Řetězec:</label>
                   <code className="text-break small">
                     {generateSpaydString({
                       iban: formData.bank_iban,
@@ -191,7 +191,7 @@ export default function PaymentSettings() {
                     })}
                   </code>
                 </div>
-                <div className="text-muted small">
+                <div className="text-mute small">
                   <Fa.FaCircleInfo className="me-1" />
                   Toto je náhled s ukázkovou částkou a variabilním symbolem. Skutečný kód na účtence bude obsahovat reálnou sumu objednávky.
                 </div>

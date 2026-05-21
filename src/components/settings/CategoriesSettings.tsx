@@ -175,7 +175,7 @@ export default function CategoriesSettings() {
               <label className="form-label small fw-bold">Ikona</label>
               <div className="d-flex align-items-center gap-2 mb-2">
                 <div style={{ width: 32, textAlign: 'center' }}><IconByName name={form.icon} size={24} /></div>
-                <code className="text-muted">{form.icon || '—'}</code>
+                <code className="text-mute">{form.icon || '—'}</code>
               </div>
               <IconPicker 
                 value={form.icon} 

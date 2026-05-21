@@ -1,14 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import * as Fa from 'react-icons/fa6';
-import dbConfig from '../../data/dbposition.json';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
 export default function ExportPage() {
   const [loading, setLoading] = useState(false);
+  const [dbPath, setDbPath] = useState('Načítám...');
+
+  useEffect(() => {
+    fetch('/api/settings/db')
+      .then(res => res.json())
+      .then(data => setDbPath(data.dbPath || 'data/pos.db'))
+      .catch(() => setDbPath('data/pos.db (chyba načítání)'));
+  }, []);
 
   // --- Funkce pro stažení souboru ---
   const downloadFile = (content: string, fileName: string, contentType: string) => {
@@ -116,8 +123,8 @@ export default function ExportPage() {
       <div className="grid">
         {/* Karta: Účtenky */}
         <div className="card cardPad">
-          <h2 className="sectionTitle"><Fa.FaReceipt /> Účtenky</h2>
-          <p className="muted">Stáhnout přehled všech uložených účtenek do CSV souboru (pro Excel).</p>
+          <h2 className="card-header d-flex gap-2"><Fa.FaReceipt /> Účtenky</h2>
+          <p className="text-mute">Stáhnout přehled všech uložených účtenek do CSV souboru (pro Excel).</p>
           <div style={{ marginTop: '1rem' }}>
             <button className="btn btn-primary" onClick={exportReceiptsCsv} disabled={loading}>
               {loading ? 'Pracuji...' : 'Stáhnout .CSV'}
@@ -127,8 +134,8 @@ export default function ExportPage() {
 
         {/* Karta: Položky */}
         <div className="card cardPad">
-          <h2 className="sectionTitle"><Fa.FaBurger /> Položky menu</h2>
-          <p className="muted">Exportovat definice položek (ceny, kategorie).</p>
+          <h2 className="card-header d-flex gap-2"><Fa.FaBurger /> Položky</h2>
+          <p className="text-mute">Exportovat definice položek (ceny, kategorie).</p>
           <div style={{ marginTop: '1rem', display: 'flex', gap: 10 }}>
             <button className="btn btn-primary" onClick={exportItemsJson} disabled={loading}>
               Záloha .JSON
@@ -141,12 +148,10 @@ export default function ExportPage() {
 
         {/* Karta: Databáze (Info) */}
         <div className="card cardPad">
-          <h2 className="sectionTitle"><Fa.FaDatabase /> Databáze</h2>
-          <p className="muted">
-            Všechna data jsou uložena lokálně v souboru:<br/>
-            <code>{dbConfig.dbPath}</code>
-          </p>
-          <p className="muted" style={{ fontSize: '0.85em' }}>Pro kompletní zálohu stačí tento soubor zkopírovat.</p>
+          <h2 className="card-header d-flex gap-2"><Fa.FaDatabase /> Databáze</h2>
+          <p className="text-mute mb-2"> Všechna data jsou uložena lokálně v souboru: </p>
+          <input type="text" readOnly value={dbPath} className="form-control mb-2" />
+          <p className="text-mute mb-2" style={{ fontSize: '0.85em' }}>Pro kompletní zálohu stačí tento soubor zkopírovat.</p>
         </div>
       </div>
     </div>

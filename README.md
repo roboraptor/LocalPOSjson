@@ -18,9 +18,10 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 
 ### Data & Management
 - **Local SQLite Database**: All data (items, categories, receipts, settings) is stored locally. The database path is configured in `src/data/dbposition.json` (defaults to `data/pos.db`).
-- **Items & Categories Editor**: Manage your menu, assign React icons, and organize items into custom categories.
+- **Dynamic Database Reconnection**: Change the database path in the UI, and the app seamlessly switches to the new DB without needing a restart.
+- **Items & Categories Editor**: Manage your menu, assign React icons (with search and favorites), and organize items into custom categories using drag-and-drop.
 - **Receipts History**: Overview of all closed receipts with filtering.
-- **PDF Export**: Generate PDF exports of receipts.
+- **Exporting**: Generate exports of receipts and export items/receipts to CSV.
 
 ### System Settings & Configuration
 - **Organization Settings**: Configure business name, address, VAT ID (IČO/DIČ).
@@ -100,8 +101,11 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - [x] Implemented "Open Tabs" and "Tables" functionality (Odložit na účet / na stůl).
 - [x] Custom items can now be added seamlessly.
 - [x] Dynamic Settings (Organization, Categories, Icons, Receipts layout).
+- [x] Refactored IconPicker with search, aliases, and favorite icons.
+- [x] CSV Exports for Receipts and Items.
 - [x] QR code payment integration (SPAYD format generation).
 - [x] Success modals for actions replacing browser `alert()`.
+- [x] Hot-swappable database via ES6 Proxy (no restart needed on path change).
 - [x] Full removal of legacy files (obsolete Pages router and JSON DB logic).
 
 ### Planned / TODOs

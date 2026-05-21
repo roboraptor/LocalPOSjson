@@ -104,7 +104,7 @@ export default function IconsSettings() {
                     }}
                 >
                     <IconByName name={iconName} size={24} />
-                    <code>{iconName}</code>
+                    <code className="text-mute">{iconName}</code>
                     <button 
                     className="btn btn-danger" 
                     style={{ padding: '4px 8px', marginLeft: '10px' }}

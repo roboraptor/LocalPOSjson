@@ -63,7 +63,7 @@ export default function EetSettings() {
               <input className="form-check-input" type="checkbox" id="eetEnabled" name="eet_enable" checked={formData.eet_enable} onChange={handleChange} />
             </div>
           </div>
-          <p className="text-muted small">Poznámka: Tato funkce je v současné době pouze pro testovací účely a negeneruje reálné kódy FIK přes servery finanční správy.</p>
+          <p className="text-mute small">Poznámka: Tato funkce je v současné době pouze pro testovací účely a negeneruje reálné kódy FIK přes servery finanční správy.</p>
           <div className="mt-4">
             <button type="submit" className="btn btn-primary"><Fa.FaFloppyDisk /> Uložit nastavení</button>
           </div>
