@@ -34,6 +34,7 @@ export function seedDb() {
       { name: "Cappuccino", price: 50, category: "Nápoje", icon: "FaMugSaucer", position: 2 },
       { name: "Tričko", price: 400, category: "Ostatní", icon: "FaShirt", position: 15 },
       { name: "Náramek", price: 70, category: "Ostatní", icon: "FaRing", position: 16 },
+      { name: "Kelímek", price: 80, category: "Ostatní", icon: "FaGlassWater", position: 17 },
       { name: "HotDog", price: 80, category: "Jídlo", icon: "FaDog", position: 12 },
       { name: "Burger", price: 120, category: "Jídlo", icon: "FaBurger", position: 11 },
     ]
