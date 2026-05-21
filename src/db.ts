@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import fs from 'fs';
 import { Tab } from './types/db'; // Import typů, které jsme vytvořili výše
 import dbConfig from './data/dbposition.json';
 
@@ -10,6 +11,10 @@ let db: any;
 
 export function getDb() {
   if (!db) {
+    const dbDir = path.dirname(dbPath);
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
     db = new Database(dbPath);
     // Enable Write-Ahead Logging for better concurrency/performance
     db.pragma('journal_mode = DELETE');
@@ -112,37 +117,45 @@ export function initDb() {
       AND is_table = 0
       AND updated_at < datetime('now', '-7 days');
     END;
+
+    -- Ensure singleton row in general table exists
+    INSERT OR IGNORE INTO general (id) VALUES (1);
   `);
   return database;
 }
 
-// Initial call
-initDb();
+// Initial call - wrap in try-catch to prevent app crash if DB fails to init
+let databaseInstance: any;
+try {
+  databaseInstance = getDb();
+  initDb();
+} catch (error) {
+  console.error('Failed to initialize database:', error);
+}
 
-const databaseInstance = getDb();
 export default databaseInstance;
 
 // Metoda pro "defragmentaci" ID tabů (srovná je 1, 2, 3... po smazání starých)
 // POZOR: Nepoužívat, pokud je zrovna někdo připojený a markuje, změní mu to ID pod rukama!
-export const reindexTabs = databaseInstance.transaction(() => {
-  // 1. Načíst existující taby (seřadíme: Stoly -> Permanentní -> Ostatní dle času)
-  const tabs = db.prepare<[], Tab>(`
+export const reindexTabs = databaseInstance?.transaction((tabsList?: Tab[]) => {
+  // 1. Načíst existující taby (seřadíme: Stoly -> Permanentní -> Ostatní dle času) pokud nejsou předány
+  const currentTabs = tabsList || databaseInstance.prepare(`
     SELECT * FROM tabs 
     ORDER BY is_table DESC, is_permanent DESC, created_at ASC
-  `).all();
+  `).all() as Tab[];
 
   // 2. Smazat tabulku a resetovat autoincrement počítadlo
-  db.prepare('DELETE FROM tabs').run();
-  db.prepare("DELETE FROM sqlite_sequence WHERE name = 'tabs'").run();
+  databaseInstance.prepare('DELETE FROM tabs').run();
+  databaseInstance.prepare("DELETE FROM sqlite_sequence WHERE name = 'tabs'").run();
 
   // 3. Vložit zpátky s novými ID
-  const insert = db.prepare(`
+  const insert = databaseInstance.prepare(`
     INSERT INTO tabs (id, name, is_permanent, is_table, created_at, updated_at, items) 
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
   let nextId = 1;
-  for (const t of tabs) {
+  for (const t of currentTabs) {
     insert.run(nextId++, t.name, t.is_permanent, t.is_table, t.created_at, t.updated_at, t.items);
   }
 });
