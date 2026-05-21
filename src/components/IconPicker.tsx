@@ -27,7 +27,14 @@ const ICON_ALIASES = {
 };
 
 
-export default function IconPicker({ value, onChange, placeholder = "Hledat ikonu…", favorites = [] }) {
+interface IconPickerProps {
+  value: string;
+  onChange: (name: string) => void;
+  placeholder?: string;
+  favorites?: string[];
+}
+
+export default function IconPicker({ value, onChange, placeholder = "Hledat ikonu…", favorites = [] }: IconPickerProps) {
   const [q, setQ] = useState("");
   const [page, setPage] = useState(0);
   const [isBrowsingAll, setIsBrowsingAll] = useState(false);
@@ -57,12 +64,12 @@ export default function IconPicker({ value, onChange, placeholder = "Hledat ikon
   const favoriteItems = useMemo(() => 
     favorites
       .map(favName => ALL_FA.find(icon => icon.name === favName))
-      .filter(Boolean), // Odfiltruje nenalezené ikony
+      .filter((icon: any) => icon !== undefined) as { name: string; Comp: any }[],
     [favorites]
   );
 
   // When the user starts typing, we should exit the "browse all" mode.
-  const handleQueryChange = (e) => {
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value;
     setQ(newQuery);
     setPage(0);

@@ -27,7 +27,7 @@ function isValidIBAN(iban: string): boolean {
 
   // Modulo 97 (pomocí BigInt pro velké řetězce čísel)
   try {
-    return BigInt(numeric) % 97n === 1n;
+    return BigInt(numeric) % BigInt(97) === BigInt(1);
   } catch {
     return false;
   }
