@@ -86,6 +86,26 @@ export default function PosPage() {
     });
   }, [generalSettings, total, receipt]);
 
+  const externalQrUrl = useMemo(() => {
+    if (!generalSettings?.bank_iban || !generalSettings?.use_external_qr_api || receipt.length === 0) return null;
+    
+    const cleanIban = generalSettings.bank_iban.replace(/\s+/g, '').toUpperCase();
+    if (cleanIban.length < 15) return null;
+
+    const params = new URLSearchParams({
+      iban: cleanIban,
+      amount: total.toFixed(2),
+      currency: 'CZK',
+      message: generalSettings.trx_msg || 'Platba',
+      size: '256',
+      branding: 'true'
+    });
+    
+    if (generalSettings.trx_ks) params.append('ks', generalSettings.trx_ks);
+
+    return `http://api.paylibo.com/paylibo/generator/image?${params.toString()}`;
+  }, [generalSettings, total, receipt]);
+
   // --- Custom Item Logic ---
   const addCustomItem = () => {
     const name = customName.trim();
@@ -456,7 +476,11 @@ export default function PosPage() {
           {spaydString ? (
             <>
               <div style={{ background: 'white', padding: '16px', borderRadius: '8px' }}>
-                <QRCodeSVG value={spaydString} size={256} />
+                {externalQrUrl ? (
+                  <img src={externalQrUrl} alt="QR Platba" width={256} height={256} />
+                ) : (
+                  <QRCodeSVG value={spaydString} size={256} />
+                )}
               </div>
               <div style={{ textAlign: 'center' }}>
                 <h3 style={{ margin: '0 0 10px 0' }}>K úhradě: {czk.format(total)}</h3>

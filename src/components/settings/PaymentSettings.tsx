@@ -50,11 +50,13 @@ function decodeCzechIBAN(iban: string): string {
 export default function PaymentSettings() {
   const [loading, setLoading] = useState(true);
   const [ibanStatus, setIbanStatus] = useState<'valid' | 'invalid' | null>(null);
+  const [testAmount, setTestAmount] = useState<string>('250.00');
   const [formData, setFormData] = useState({
     bank_iban: '',
     trx_msg: '',
     trx_vs_enabled: false,
-    trx_ks: ''
+    trx_ks: '',
+    use_external_qr_api: false
   });
 
   useEffect(() => {
@@ -66,8 +68,9 @@ export default function PaymentSettings() {
            setFormData({
                bank_iban: iban,
                trx_msg: data.trx_msg || '',
-               trx_vs_enabled: Boolean(data.trx_vs_enabled),
-               trx_ks: data.trx_ks || ''
+               trx_vs_enabled: data.trx_vs_enabled === 1 || data.trx_vs_enabled === '1' || data.trx_vs_enabled === true || data.trx_vs_enabled === 'true',
+               trx_ks: data.trx_ks || '',
+               use_external_qr_api: data.use_external_qr_api === 1 || data.use_external_qr_api === '1' || data.use_external_qr_api === true || data.use_external_qr_api === 'true'
            });
            if (iban) setIbanStatus(isValidIBAN(iban) ? 'valid' : 'invalid');
         }
@@ -159,44 +162,93 @@ export default function PaymentSettings() {
             <input type="text" className="form-control" name="trx_msg" value={formData.trx_msg || ''} onChange={handleChange} placeholder="Zpráva, která se objeví v transakci..." />
           </div>
           <hr />
-          <h6 className="mb-3 text-mute">QR Logika (Náhled)</h6>
-          {ibanStatus === 'valid' ? (
-            <div className="row align-items-center bg-light p-3 rounded mx-0">
-              <div className="col-auto">
-                <QRCodeSVG 
-                  value={generateSpaydString({
-                    iban: formData.bank_iban,
+          <h6 className="mb-3 text-mute">QR Logika</h6>
 
-                    currency: 'CZK',
-                    vs: formData.trx_vs_enabled ? '1234567890' : '', // Sample VS for preview
-                    ks: formData.trx_ks,
-                    msg: formData.trx_msg
-                  })} 
-                  size={128}
-                  level="M"
-                  includeMargin={true}
-                />
-              </div>
-              <div className="col">
-                <div className="mb-2">
-                  <label className="small fw-bold text-mute d-block">SPAYD Řetězec:</label>
-                  <code className="text-break small">
-                    {generateSpaydString({
+          <div className="">
+            <div className="form-check form-switch">
+              <input className="form-check-input" type="checkbox" id="externalApi" name="use_external_qr_api" checked={formData.use_external_qr_api} onChange={handleChange} />
+              <label className="form-check-label fw-bold" htmlFor="externalApi">Použít externí API (QR Platba)</label>
+            </div>
+            <small className="text-mute d-block mt-1">Generuje hezčí QR kód s rámečkem pomocí API paylibo.com (vyžaduje připojení k internetu).</small>
+          </div>
+          
+          <hr />
+          <h6 className="mb-3 text-mute">Náhled QR Řešení</h6>
+
+          <div className="col-md-3 mb-3">
+            <label className="form-label fw-bold">Testovací částka</label>
+            <input type="number" step="0.01" className="form-control" name="test_amount" value={testAmount} onChange={(e) => setTestAmount(e.target.value)}  />
+          </div>
+          
+          {ibanStatus === 'valid' ? (
+            <>
+              {/* Lokální generování (vždy zobrazeno) */}
+              <div className="row align-items-center bg-dark p-3 rounded mx-0 mb-3">
+                <div className="col-auto">
+                  <QRCodeSVG 
+                    value={generateSpaydString({
                       iban: formData.bank_iban,
-                     
+                      amount: Number(testAmount) || 0,
                       currency: 'CZK',
-                      vs: formData.trx_vs_enabled ? '1234567890' : '',
+                      vs: formData.trx_vs_enabled ? '1234567890' : '', // Sample VS for preview
                       ks: formData.trx_ks,
                       msg: formData.trx_msg
-                    })}
-                  </code>
+                    })} 
+                    size={128}
+                    level="M"
+                    includeMargin={true}
+                  />
                 </div>
-                <div className="text-mute small">
-                  <Fa.FaCircleInfo className="me-1" />
-                  Toto je náhled s ukázkovou částkou a variabilním symbolem. Skutečný kód na účtence bude obsahovat reálnou sumu objednávky.
+                <div className="col">
+                  <div className="mb-2">
+                    <label className="small fw-bold text-mute d-block">SPAYD Řetězec (Lokální):</label>
+                    <code className="text-break small">
+                      {generateSpaydString({
+                        iban: formData.bank_iban,
+                        amount: Number(testAmount) || 0,
+                        currency: 'CZK',
+                        vs: formData.trx_vs_enabled ? '1234567890' : '',
+                        ks: formData.trx_ks,
+                        msg: formData.trx_msg
+                      })}
+                    </code>
+                  </div>
+                  <div className="text-mute small">
+                    <Fa.FaCircleInfo className="me-1" />
+                    Toto je lokálně generovaný QR kód. Rychlé, bez internetu, ale bez grafického brandingu.
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {/* Externí API (Paylibo) */}
+              {formData.use_external_qr_api ? (
+              <div className="row align-items-center bg-dark p-3 rounded mx-0">
+                <div className="col-auto">
+                  <img 
+                    src={`http://api.paylibo.com/paylibo/generator/image?iban=${formData.bank_iban.replace(/\s+/g, '')}&amount=${testAmount || '0.00'}&currency=CZK&vs=${formData.trx_vs_enabled ? '1234567890' : ''}&message=${encodeURIComponent(formData.trx_msg)}&size=128&branding=true`} 
+                    alt="QR Platba" 
+                    width={128} 
+                    height={128} 
+                    style={{ background: 'white', borderRadius: 8 }}
+                  />
+                </div>
+                <div className="col">
+                  <div className="mb-2">
+                    <label className="small fw-bold text-mute d-block">SPAYD Řetězec (Paylibo API):</label>
+                    <iframe 
+                      src={`http://api.paylibo.com/paylibo/generator/string?iban=${formData.bank_iban.replace(/\s+/g, '')}&amount=${testAmount || '0.00'}&currency=CZK&vs=${formData.trx_vs_enabled ? '1234567890' : ''}&message=${encodeURIComponent(formData.trx_msg)}`}
+                      style={{ width: '100%', height: '50px', border: 'none', overflow: 'hidden', background: 'transparent' }}
+                      title="Paylibo SPAYD String"
+                    />
+                  </div>
+                  <div className="text-mute small">
+                    <Fa.FaCircleInfo className="me-1" />
+                    Toto je náhled z externího API (Paylibo). Vyžaduje připojení k internetu, ale obsahuje hezčí grafiku. Bude použit pouze, pokud je API nahoře zapnuto.
+                  </div>
+                </div>
+              </div>
+              ):( null )}
+            </>
           ) : (
             <div className="alert alert-warning py-2 small">
               Zadejte platný IBAN pro zobrazení náhledu QR kódu.

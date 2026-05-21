@@ -29,6 +29,7 @@ export async function POST(req: Request) {
     const trx_vs_enabled = body.trx_vs_enabled !== undefined ? (body.trx_vs_enabled ? 1 : 0) : current.trx_vs_enabled;
     const trx_ks = body.trx_ks !== undefined ? (body.trx_ks ? Number(body.trx_ks) : null) : current.trx_ks;
     const eet_enable = body.eet_enable !== undefined ? (body.eet_enable ? 1 : 0) : current.eet_enable;
+    const use_external_qr_api = body.use_external_qr_api !== undefined ? (body.use_external_qr_api ? 1 : 0) : (current.use_external_qr_api || 0);
     const currency = body.currency !== undefined ? body.currency : current.currency;
     const tax_rate = body.tax_rate !== undefined ? Number(body.tax_rate) : current.tax_rate;
     const tax_enabled = body.tax_enabled !== undefined ? (body.tax_enabled ? 1 : 0) : current.tax_enabled;
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
       SET organization_name = ?, organization_address = ?, organization_owner = ?,
           organization_id = ?, organization_vat_id = ?, 
           bank_iban = ?, trx_msg = ?, trx_vs_enabled = ?, trx_ks = ?,
-          eet_enable = ?,
+          eet_enable = ?, use_external_qr_api = ?,
           currency = ?, tax_rate = ?, tax_enabled = ?,
           receipt_title = ?, receipt_header = ?, receipt_header_enabled = ?,
           receipt_footer = ?, receipt_footer_enabled = ?
@@ -57,7 +58,7 @@ export async function POST(req: Request) {
       trx_msg || null,
       trx_vs_enabled,
       trx_ks,
-      eet_enable,
+      eet_enable, use_external_qr_api,
       currency || 'CZK', Number(tax_rate) || 0, tax_enabled,
       receipt_title || '', receipt_header || '', receipt_header_enabled,
       receipt_footer || '', receipt_footer_enabled

@@ -17,7 +17,8 @@ export function seedDb() {
       receipt_header_enabled: 0,
       receipt_footer: "Děkujeme za návštěvu",
       receipt_footer_enabled: 1,
-      eet_enable: 0
+      eet_enable: 0,
+      use_external_qr_api: 0
     },
     categories: [
       { name: "Nápoje", color: "#22c55e", icon: "FaBeerMugEmpty", position: 1 },
@@ -50,7 +51,7 @@ export function seedDb() {
         trx_vs_enabled = ?, trx_ks = ?, receipt_title = ?, 
         receipt_header = ?, receipt_header_enabled = ?, 
         receipt_footer = ?, receipt_footer_enabled = ?,
-        eet_enable = ?
+        eet_enable = ?, use_external_qr_api = ?
       WHERE id = 1
     `);
     
@@ -60,7 +61,7 @@ export function seedDb() {
       seedData.general.trx_vs_enabled, seedData.general.trx_ks, seedData.general.receipt_title,
       seedData.general.receipt_header, seedData.general.receipt_header_enabled,
       seedData.general.receipt_footer, seedData.general.receipt_footer_enabled,
-      seedData.general.eet_enable
+      seedData.general.eet_enable, seedData.general.use_external_qr_api
     );
 
     // Seed categories
