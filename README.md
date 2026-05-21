@@ -68,18 +68,21 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
    npm install
    ```
 
-2. **(Optional) Migrate legacy JSON data:**
+2. **Environment Setup:**
+   The application requires an `ADMIN_SECRET` for settings access. On first run, a `.env` file will be automatically created from `.env.example` with the default password `posadmin123`. You can change this anytime in the `.env` file.
+
+3. **(Optional) Migrate legacy JSON data:**
    If you have old `data/items.json` or `data/receipts.json` and want to migrate them into the SQLite database:
    ```bash
    node scripts/migrate.js
    ```
 
-3. **Start the development server:**
+4. **Start the development server:**
    ```bash
    npm run dev
    ```
 
-4. **Access the application:**
+5. **Access the application:**
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
@@ -91,17 +94,18 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - [x] Migrated from JSON file storage to SQLite (`better-sqlite3`).
 - [x] Centralized database path configuration in `src/data/dbposition.json`.
 - [x] Advanced DB Management (Verify, Create Structure, Seed Data, Wipe).
+- [x] Secured settings with admin password (managed via `.env`).
 - [x] Implemented "Open Tabs" and "Tables" functionality (Odložit na účet / na stůl).
 - [x] Custom items can now be added seamlessly.
 - [x] Dynamic Settings (Organization, Categories, Icons, Receipts layout).
 - [x] QR code payment integration (SPAYD format generation).
 - [x] Success modals for actions replacing browser `alert()`.
+- [x] Full removal of legacy files (obsolete Pages router and JSON DB logic).
 
 ### Planned / TODOs
 - [ ] Log and distinguish payment methods in DB (cash, card, QR).
 - [ ] Direct thermal printer integration (e.g., ESC/POS).
 - [ ] Advanced dashboard analytics / daily summaries.
-- [ ] Full removal of legacy files in `/src/pages/` and `/src/lib/db.js`.
 - [ ] Restrict the "Price" fields strictly to numeric inputs / virtual numpad for touchscreens.
 
 ---
