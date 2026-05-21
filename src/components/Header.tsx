@@ -20,7 +20,7 @@ export default function Header() {
     <nav className="navbar navbar-expand-sm navbar-dark shadow-sm">
       <div className="container">
         <Link href="/" className="navbar-brand fw-bold">
-          LocalPOSsqlite
+          LocalPOSqlite
         </Link>
 
         <button 
