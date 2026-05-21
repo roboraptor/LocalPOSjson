@@ -15,7 +15,7 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - **QR Code Payments**: Instantly generate SPAYD QR codes for seamless bank transfers directly in the POS view.
 
 ### Data & Management
-- **Local SQLite Database**: All data (items, categories, receipts, settings) is stored locally in `data/pos.db`.
+- **Local SQLite Database**: All data (items, categories, receipts, settings) is stored locally. The database path is configured in `src/data/dbposition.json` (defaults to `data/pos.db`).
 - **Items & Categories Editor**: Manage your menu, assign React icons, and organize items into custom categories.
 - **Receipts History**: Overview of all closed receipts with filtering.
 - **PDF Export**: Generate PDF exports of receipts.
@@ -40,7 +40,7 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 ## 📂 Project Structure
 
 ```
-/data/               # SQLite database file (pos.db) and legacy JSON seeds
+/data/               # Default SQLite database location
 /scripts/            # Migration scripts (JSON -> SQLite)
 /src/
   ├── app/           # Next.js 15 App Router (Pages & API Routes)

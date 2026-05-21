@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import * as Fa from 'react-icons/fa6';
+import dbConfig from '../../data/dbposition.json';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
@@ -143,7 +144,7 @@ export default function ExportPage() {
           <h2 className="sectionTitle"><Fa.FaDatabase /> Databáze</h2>
           <p className="muted">
             Všechna data jsou uložena lokálně v souboru:<br/>
-            <code>/data/pos.db</code>
+            <code>{dbConfig.dbPath}</code>
           </p>
           <p className="muted" style={{ fontSize: '0.85em' }}>Pro kompletní zálohu stačí tento soubor zkopírovat.</p>
         </div>

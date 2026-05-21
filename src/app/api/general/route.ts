@@ -16,7 +16,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const current = db.prepare('SELECT * FROM general WHERE id = 1').get();
+    const current = db.prepare('SELECT * FROM general WHERE id = 1').get() as any;
 
     // Vybereme pole z body, pokud chybí, použijeme aktuální hodnotu z DB
     const organization_name = body.organization_name !== undefined ? body.organization_name : current.organization_name;
