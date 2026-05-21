@@ -1,10 +1,12 @@
 // c:\projects\LocalPOSjson\src\app\page.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import * as Fa from 'react-icons/fa6';
 import Modal from '@/components/Modal'; 
 import { Item, Category, Tab } from '@/types/db';
+import { QRCodeSVG } from 'qrcode.react';
+import { generateSpaydString } from '@/lib/spayd';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
 
@@ -32,18 +34,23 @@ export default function PosPage() {
   const [showTableModal, setShowTableModal] = useState(false);
   const [tabInputName, setTabInputName] = useState('');
   
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [generalSettings, setGeneralSettings] = useState<any>({});
+  
   // --- Načtení dat při startu ---
   const fetchAllData = async () => {
     try {
-      const [itemsRes, catsRes, tabsRes] = await Promise.all([
+      const [itemsRes, catsRes, tabsRes, generalRes] = await Promise.all([
         fetch('/api/items'),
         fetch('/api/categories'),
-        fetch('/api/tabs')
+        fetch('/api/tabs'),
+        fetch('/api/general')
       ]);
 
       if (itemsRes.ok) setItems(await itemsRes.json());
       if (catsRes.ok) setCategories(await catsRes.json());
       if (tabsRes.ok) setTabsList(await tabsRes.json());
+      if (generalRes.ok) setGeneralSettings(await generalRes.json());
     } catch (error) {
       console.error('Chyba načítání dat:', error);
     } finally {
@@ -65,6 +72,17 @@ export default function PosPage() {
   const removeItem = (indexToRemove: number) => setReceipt((r) => r.filter((_, idx) => idx !== indexToRemove));
   
   const total = receipt.reduce((sum, item) => sum + (item.price || 0), 0);
+
+  const spaydString = useMemo(() => {
+    if (!generalSettings?.bank_iban || receipt.length === 0) return '';
+    return generateSpaydString({
+      iban: generalSettings.bank_iban,
+      amount: total,
+      currency: 'CZK',
+      msg: generalSettings.trx_msg || 'Platba',
+      ks: generalSettings.trx_ks || '0308',
+    });
+  }, [generalSettings, total, receipt]);
 
   // --- Custom Item Logic ---
   const addCustomItem = () => {
@@ -273,22 +291,27 @@ export default function PosPage() {
               <div className="btn-items__title">Na stůl</div>
               <div className="btn-items__icon"><Fa.FaChair /></div>
             </button>
-          </div>
-
-          <h2 className="sectionTitle">Akce</h2>
-          <div className="grid" style={{ marginTop: 10 }}>
             {activeTab && (
-              <button className="btn btn-info" onClick={() => handleSaveTab()}>
-                Odložit
+              <button className="btn btn-warning btn-items--tri" onClick={() => handleSaveTab()}>
+                <div className="btn-items__title">Odložit</div>
+                <div className="btn-items__icon"><Fa.FaFloppyDisk /></div>        
               </button>
             )}
-            <button className="btn btn-primary" onClick={saveReceipt} disabled={receipt.length === 0}>
-              {activeTab ? 'Zaplatit účtenku' : 'Zaplatit'}
+            <button className="btn btn-primary btn-items--tri" onClick={saveReceipt} disabled={receipt.length === 0}>
+              <div className="btn-items__title">{activeTab ? 'Zaplatit účtenku' : 'Zaplatit'}</div>
+              <div className="btn-items__icon"><Fa.FaMoneyBill /></div>
             </button>
-            <button className="btn btn-danger" onClick={clearReceipt} disabled={receipt.length === 0 && !activeTab}>
-              {activeTab ? 'Zrušit' : 'Vyprázdnit'}
+            <button className="btn btn-primary btn-items--tri" onClick={() => setShowQRModal(true)} disabled={receipt.length === 0}>
+              <div className="btn-items__title">{activeTab ? 'Zaplatit QR' : 'Zaplatit QR'}</div>
+              <div className="btn-items__icon"><Fa.FaQrcode /></div>
+            </button>
+            <button className="btn btn-danger btn-items--tri" onClick={clearReceipt} disabled={receipt.length === 0 && !activeTab}>
+              <div className="btn-items__title">{activeTab ? 'Zrušit' : 'Vyprázdnit'}</div>
+              <div className="btn-items__icon"><Fa.FaTrashCan /></div>
             </button>
           </div>
+
+
         </div>
       </div>
 
@@ -406,8 +429,42 @@ export default function PosPage() {
       <Modal open={savedModalOpen} onClose={() => setSavedModalOpen(false)} title="Hotovo">
         <div style={{ textAlign: 'center', fontSize: '3rem' }}>✅</div>
         <p style={{ textAlign: 'center' }}>Účtenka uložena.</p>
-        <div className="modalActions">
-          <button className="btn btn-primary" onClick={() => setSavedModalOpen(false)}>OK</button>
+        <div className="modalActions ">
+          <button className="btn btn-success btn-items--tri" onClick={() => setSavedModalOpen(false)}>
+            <div className="btn-items__title">Zaplaceno</div>
+            <div className="btn-items__icon"><Fa.FaMoneyBill /></div>
+          </button>
+        </div>
+      </Modal>
+
+      <Modal open={showQRModal} onClose={() => setShowQRModal(false)} title="QR Platba">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', padding: '20px 0' }}>
+          {spaydString ? (
+            <>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '8px' }}>
+                <QRCodeSVG value={spaydString} size={256} />
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ margin: '0 0 10px 0' }}>K úhradě: {czk.format(total)}</h3>
+                <p style={{ margin: 0, color: '#666' }}>Oskenujte QR kód v bankovní aplikaci.</p>
+              </div>
+            </>
+          ) : (
+            <p className="muted">Není nastaven IBAN pro platby, nebo je účtenka prázdná.</p>
+          )}
+        </div>
+        <div className=" modalActions">
+          <button className="btn btn-success btn-items--tri " onClick={() => {
+            saveReceipt();
+            setShowQRModal(false);
+          }}>
+            <div className="btn-items__title">Zaplaceno</div>
+            <div className="btn-items__icon"><Fa.FaQrcode /></div>
+          </button>
+          <button className="btn btn-ghost btn-items--tri" onClick={() => setShowQRModal(false)}>
+            <div className="btn-items__title">Zrušit</div>
+            <div className="btn-items__icon"><Fa.FaTrashCan /></div>
+          </button>
         </div>
       </Modal>
 

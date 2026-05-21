@@ -6,6 +6,12 @@
 .modalIcon { font-size: 48px; line-height: 1; margin-bottom: var(--sp-4); }
 .modalTitle { font-size: 20px; font-weight: 800; margin-bottom: var(--sp-2); }
 .modalText { color: var(--muted); margin-bottom: var(--sp-6); }
-.modalActions { display: flex; justify-content: center; }
+.modalActions { 
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(var(--item-min), var(--item-max)));
+   justify-content: center;
+   gap: var(--sp-2); 
+   
+}
 @keyframes modalFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .modalOverlay { animation: none; } }

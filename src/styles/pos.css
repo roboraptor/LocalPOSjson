@@ -17,7 +17,7 @@
   /* Rozměry dlaždic */
   --item-min: 140px;                  /* min. šířka jedné dlaždice v gridu */
   --item-row: 92px;                   /* výška řádku gridu (sjednocuje výšky) */
-  --item-pad: 8px;                   /* vnitřní odsazení obsahu tlačítka */
+  --item-pad: 6px;                   /* vnitřní odsazení obsahu tlačítka */
   --item-icon: 20px;                  /* velikost čtverce pro ikonu uvnitř dlaždice */
 
   /* Základní typografie pro tlačítko */

@@ -21,7 +21,10 @@ db.exec(`
     organization_owner TEXT,
     currency TEXT DEFAULT 'CZK',
     organization_id TEXT,
-    bank_account_number TEXT,
+    bank_iban TEXT,
+    trx_msg TEXT,
+    trx_vs_enabled INTEGER DEFAULT 0,
+    trx_ks INTEGER,
     tax_rate REAL DEFAULT 21.0,
     organization_vat_id TEXT,
     tax_enabled INTEGER DEFAULT 0,
@@ -29,7 +32,8 @@ db.exec(`
     receipt_header TEXT,
     receipt_header_enabled INTEGER DEFAULT 0,
     receipt_footer TEXT,
-    receipt_footer_enabled INTEGER DEFAULT 0
+    receipt_footer_enabled INTEGER DEFAULT 0,
+    eet_enable INTEGER DEFAULT 0
   );
   INSERT OR IGNORE INTO general (id) VALUES (1);
 
@@ -55,7 +59,11 @@ db.exec(`
     id INTEGER PRIMARY KEY, -- We use timestamp as ID
     created_at TEXT NOT NULL,
     issued_to TEXT,
-    items TEXT NOT NULL -- JSON blob of the receipt items at time of purchase
+    items TEXT NOT NULL, -- JSON blob of the receipt items at time of purchase
+    payment_method TEXT,
+    eet_fik TEXT,
+    eet_bkp TEXT,
+    eet_pkp TEXT
   );
 
   -- Index for faster sorting of receipts by date

@@ -24,18 +24,22 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { receipt, issued_to } = body;
+    const { receipt, issued_to, payment_method, eet_fik, eet_bkp, eet_pkp } = body;
 
     const stmt = db.prepare(`
-        INSERT INTO receipts (created_at, issued_to, items)
-        VALUES (?, ?, ?)
+        INSERT INTO receipts (created_at, issued_to, items, payment_method, eet_fik, eet_bkp, eet_pkp)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
 
     // Ukládáme items jako JSON string
     const info = stmt.run(
         new Date().toISOString(),
         issued_to || null,
-        JSON.stringify(receipt || [])
+        JSON.stringify(receipt || []),
+        payment_method || 'cash',
+        eet_fik || null,
+        eet_bkp || null,
+        eet_pkp || null
     );
 
     return NextResponse.json({ success: true, id: info.lastInsertRowid });
