@@ -9,6 +9,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { generateSpaydString } from '@/lib/spayd';
 
 const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
+const modal_timeout = 3000;
 
 export default function PosPage() {
   // --- Data ---
@@ -24,6 +25,7 @@ export default function PosPage() {
   
   // --- Modals State ---
   const [savedModalOpen, setSavedModalOpen] = useState(false);
+  const [lastPaymentMethod, setLastPaymentMethod] = useState<string>('Cash');
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [showCustomModal, setShowCustomModal] = useState(false);
@@ -175,7 +177,7 @@ export default function PosPage() {
   };
 
   // --- Uložení účtenky (Checkout) ---
-  const saveReceipt = async () => {
+  const saveReceipt = async (paymentMethod: string = 'Cash') => {
     if (receipt.length === 0) return alert('Účtenka je prázdná.');
 
     try {
@@ -184,7 +186,8 @@ export default function PosPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           receipt,
-          issued_to: activeTab ? activeTab.name : null
+          issued_to: activeTab ? activeTab.name : null,
+          payment_method: paymentMethod
         })
       });
 
@@ -212,9 +215,10 @@ export default function PosPage() {
       await fetchAllData();
       clearReceipt();
       
+      setLastPaymentMethod(paymentMethod);
       setSavedModalOpen(true);
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = setTimeout(() => setSavedModalOpen(false), 5000);
+      hideTimerRef.current = setTimeout(() => setSavedModalOpen(false), modal_timeout + 100); // Add a small buffer for the animation
 
     } catch (e: any) {
       alert(e.message || 'Chyba při ukládání.');
@@ -297,7 +301,7 @@ export default function PosPage() {
                 <div className="btn-items__icon"><Fa.FaFloppyDisk /></div>        
               </button>
             )}
-            <button className="btn btn-primary btn-items--tri" onClick={saveReceipt} disabled={receipt.length === 0}>
+            <button className="btn btn-primary btn-items--tri" onClick={() => saveReceipt('Cash')} disabled={receipt.length === 0}>
               <div className="btn-items__title">{activeTab ? 'Zaplatit účtenku' : 'Zaplatit'}</div>
               <div className="btn-items__icon"><Fa.FaMoneyBill /></div>
             </button>
@@ -429,10 +433,20 @@ export default function PosPage() {
       <Modal open={savedModalOpen} onClose={() => setSavedModalOpen(false)} title="Hotovo">
         <div style={{ textAlign: 'center', fontSize: '3rem' }}>✅</div>
         <p style={{ textAlign: 'center' }}>Účtenka uložena.</p>
+        
+        <div className="unloading-bar-container">
+          <div 
+            className="unloading-bar" 
+            style={{ '--unload-duration': `${modal_timeout}ms` } as React.CSSProperties}
+          />
+        </div>
+
         <div className="modalActions ">
           <button className="btn btn-success btn-items--tri" onClick={() => setSavedModalOpen(false)}>
             <div className="btn-items__title">Zaplaceno</div>
-            <div className="btn-items__icon"><Fa.FaMoneyBill /></div>
+            <div className="btn-items__icon">
+              {lastPaymentMethod === 'QR' ? <Fa.FaQrcode /> : <Fa.FaMoneyBill />}
+            </div>
           </button>
         </div>
       </Modal>
@@ -455,7 +469,7 @@ export default function PosPage() {
         </div>
         <div className=" modalActions">
           <button className="btn btn-success btn-items--tri " onClick={() => {
-            saveReceipt();
+            saveReceipt('QR');
             setShowQRModal(false);
           }}>
             <div className="btn-items__title">Zaplaceno</div>

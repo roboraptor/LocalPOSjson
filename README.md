@@ -104,12 +104,12 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - [x] Refactored IconPicker with search, aliases, and favorite icons.
 - [x] CSV Exports for Receipts and Items.
 - [x] QR code payment integration (SPAYD format generation).
-- [x] Success modals for actions replacing browser `alert()`.
+- [x] Success modals for actions replacing browser `alert()` featuring dynamic icons and auto-dismissing unloading bars.
 - [x] Hot-swappable database via ES6 Proxy (no restart needed on path change).
 - [x] Full removal of legacy files (obsolete Pages router and JSON DB logic).
+- [x] Log and distinguish payment methods in DB (Cash vs QR).
 
 ### Planned / TODOs
-- [ ] Log and distinguish payment methods in DB (cash, card, QR).
 - [ ] Direct thermal printer integration (e.g., ESC/POS).
 - [ ] Advanced dashboard analytics / daily summaries.
 - [ ] Restrict the "Price" fields strictly to numeric inputs / virtual numpad for touchscreens.

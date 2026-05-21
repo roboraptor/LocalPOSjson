@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         new Date().toISOString(),
         issued_to || null,
         JSON.stringify(receipt || []),
-        payment_method || 'cash',
+        payment_method || null,
         eet_fik || null,
         eet_bkp || null,
         eet_pkp || null
