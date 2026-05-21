@@ -25,6 +25,7 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - **Payment Settings**: Setup your bank IBAN, Constant Symbol, and default messages for QR payments.
 - **Receipt Customization**: Configure custom headers and footers for printed/exported receipts.
 - **EET**: Preparations for EET (Electronic Registration of Sales) configuration.
+- **Database Management**: Integrated tools to verify, create, seed, or wipe the local database directly from the UI.
 
 ---
 
@@ -45,10 +46,11 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 /src/
   ├── app/           # Next.js 15 App Router (Pages & API Routes)
   ├── components/    # Reusable React components (Modals, Settings Panels)
+  ├── data/          # Configuration files (dbposition.json, icons)
   ├── lib/           # Utilities (e.g., SPAYD generator)
-  ├── styles/        # Global and component-specific CSS styles
   ├── types/         # TypeScript definitions
-  └── db.ts          # better-sqlite3 database connection and schema
+  ├── db.ts          # better-sqlite3 connection and schema definition
+  └── dbSeed.ts      # Default data seeding logic
 ```
 
 ---
@@ -87,6 +89,8 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 ### Completed (V2 transition)
 - [x] Migrated from Next.js Pages router to App Router.
 - [x] Migrated from JSON file storage to SQLite (`better-sqlite3`).
+- [x] Centralized database path configuration in `src/data/dbposition.json`.
+- [x] Advanced DB Management (Verify, Create Structure, Seed Data, Wipe).
 - [x] Implemented "Open Tabs" and "Tables" functionality (Odložit na účet / na stůl).
 - [x] Custom items can now be added seamlessly.
 - [x] Dynamic Settings (Organization, Categories, Icons, Receipts layout).
