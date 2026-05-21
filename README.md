@@ -1,6 +1,6 @@
 # 🧾 Local POS V2
 
-[![Node.js CI Build](https://github.com/roboraptor/LocalPOSqlite/actions/workflows/node.js.yml/badge.svg)](https://github.com/roboraptor/LocalPOSqlite/actions/workflows/node.js.yml)
+[![Node.js CI Build](https://github.com/roboraptor/LocalPOSqlite/actions/workflows/node.js.build.yml/badge.svg)](https://github.com/roboraptor/LocalPOSqlite/actions/workflows/node.js.build.yml)
 [![Node.js CI Test](https://github.com/roboraptor/LocalPOSqlite/actions/workflows/node.js.test.yml/badge.svg)](https://github.com/roboraptor/LocalPOSqlite/actions/workflows/node.js.test.yml)
 
 A complete, locally-hosted Point of Sale (POS) and cash register web application built with **Next.js 15 (App Router)** + **React 19**, using **SQLite** (`better-sqlite3`) for reliable data storage.
