@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import * as Fa from 'react-icons/fa6';
 
 import CategoriesSettings from '@/components/settings/CategoriesSettings';
 import OrgSettings from '@/components/settings/OrgSettings';
@@ -13,10 +14,97 @@ import DBSettings from '@/components/settings/DBSettings';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('org_info');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Kontrola, zda je uživatel již přihlášen v rámci session
+    if (sessionStorage.getItem('pos_admin_auth') === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem('pos_admin_auth', 'true');
+      } else {
+        setError(data.error || 'Přihlášení selhalo.');
+      }
+    } catch (err) {
+      setError('Chyba při komunikaci se serverem.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('pos_admin_auth');
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '70vh' }}>
+        <div className="card shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
+          <div className="text-center mb-4">
+            <Fa.FaLock size={40} className="text-primary mb-3" />           
+          </div>
+          
+          <form onSubmit={handleLogin}>
+            <div className="mb-3">
+              <input 
+                type="password" 
+                className={`form-control ${error ? 'is-invalid' : ''}`}
+                placeholder="Zadejte heslo..."
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoFocus
+              />
+              {error && <div className="invalid-feedback">{error}</div>}
+            </div>
+            <button 
+              type="submit" 
+              className="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
+              disabled={loading}
+            >
+              {loading ? 'Ověřování...' : <><Fa.FaUnlock /> Vstoupit</>}
+            </button>
+          </form>
+          
+          <div className="text-center mt-4">
+
+            <Link href="/" className="text-decoration-none d-flex align-items-center justify-content-center small gap-2 text-secondary">
+              <Fa.FaArrowLeft /> Zpět na hlavní obrazovku 
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container">
-      <div className="d-flex justify-content-between align-items-center">
-        <h1 className="pageTitle">Nastavení</h1>
+      <div className="d-flex justify-content-between align-items-center my-3">
+        <h1 className="pageTitle my-0">Nastavení</h1>
+        <button className="btn btn-outline-danger btn-sm d-flex align-items-center gap-2" style={{ height: 36}} onClick={handleLogout}>
+          <Fa.FaPowerOff /> Odhlásit se
+        </button>
       </div>
       <div className="row">
         <div className="col-md-3">
@@ -79,7 +167,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="col-md-9">
-          <div className="card shadow-sm border-0"></div>
+          <div className="card shadow-sm border-0">
             {activeTab === 'categories' && <CategoriesSettings />}
             {activeTab === 'icons' && <IconsSettings />}
             {activeTab === 'tables' && <TablesSettings />}
@@ -89,6 +177,7 @@ export default function SettingsPage() {
             {activeTab === 'eet_info' && <EetSettings />}
             {activeTab === 'db_settings' && <DBSettings />}
           </div>
+        </div>
       </div>
     
 

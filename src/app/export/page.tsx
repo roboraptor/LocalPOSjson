@@ -108,8 +108,8 @@ export default function ExportPage() {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
-        <h1 className="pageTitle">Export dat</h1>
+      <div className="d-flex justify-content-between align-items-center my-3">
+        <h1 className="pageTitle my-0">Export dat</h1>
 
       </div>
 

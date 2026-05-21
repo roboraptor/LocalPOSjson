@@ -126,7 +126,9 @@ export default function ReceiptsPage() {
   if (loading) {
     return (
       <div className="container">
-        <h1 className="pageTitle">Uložené účtenky</h1>
+        <div className="d-flex justify-content-between align-items-center my-3">
+          <h1 className="pageTitle my-0">Uložené účtenky</h1>
+        </div>
         <div className="card skeleton" />
         <div className="card skeleton" />
       </div>
@@ -144,8 +146,8 @@ export default function ReceiptsPage() {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center'}}>
-        <h1 className="pageTitle">Uložené účtenky</h1>
+      <div className="d-flex justify-content-between align-items-center my-3">
+        <h1 className="pageTitle my-0">Uložené účtenky</h1>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
 
         </div>

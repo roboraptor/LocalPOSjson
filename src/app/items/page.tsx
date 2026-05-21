@@ -223,11 +223,8 @@ export default function ItemsAdmin() {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center'}}>
-        <h1 className="pageTitle">Položky menu</h1>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-
-        </div>
+      <div className="d-flex justify-content-between align-items-center my-3">
+        <h1 className="pageTitle my-0">Položky menu</h1>
       </div>
 
       {err && <div className="alert alert-error">{err}</div>}

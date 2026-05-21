@@ -7,6 +7,13 @@ import dbConfig from './data/dbposition.json';
 // Ensure the database file is stored in the configured directory
 const dbPath = path.resolve(process.cwd(), dbConfig.dbPath);
 
+// Create .env from .env.example if it doesn't exist
+const envPath = path.resolve(process.cwd(), '.env');
+const envExamplePath = path.resolve(process.cwd(), '.env.example');
+if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
+  fs.copyFileSync(envExamplePath, envPath);
+}
+
 let db: any;
 
 export function getDb() {
