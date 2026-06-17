@@ -58,4 +58,5 @@ export interface GeneralSettings {
   receipt_header_enabled: number;
   receipt_footer: string | null;
   receipt_footer_enabled: number;
+  use_external_qr_api: number;
 }

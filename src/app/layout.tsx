@@ -16,9 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="cs">
-      <body>
+      <body className="d-flex flex-column min-vh-100 m-0">
         <Header />
-        <main>{children}</main>
+        <main className="flex-grow-1 d-flex flex-column">{children}</main>
       </body>
     </html>
   );

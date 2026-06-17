@@ -43,7 +43,7 @@ export function getDb() {
     }
     db = new Database(expectedPath);
     // Enable Write-Ahead Logging for better concurrency/performance
-    db.pragma('journal_mode = DELETE');
+    db.pragma('journal_mode = WAL');
     currentDbPath = expectedPath;
   }
   return db;
@@ -71,7 +71,8 @@ export function initDb() {
       receipt_header_enabled INTEGER DEFAULT 0,
       receipt_footer TEXT,
       receipt_footer_enabled INTEGER DEFAULT 0,
-      eet_enable INTEGER DEFAULT 0
+      eet_enable INTEGER DEFAULT 0,
+      use_external_qr_api INTEGER DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS categories (
