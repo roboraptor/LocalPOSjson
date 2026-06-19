@@ -29,35 +29,93 @@ export default function CustomerDisplayPage() {
 
   const [shopName, setShopName] = useState<string>('EffortUp');
   const [floatingIcons, setFloatingIcons] = useState<any[]>([]);
+  const [favoriteIconNames, setFavoriteIconNames] = useState<string[]>([]);
+  const [particles, setParticles] = useState<any[]>([]);
 
   // Generování plovoucích ikon na pozadí
   useEffect(() => {
-    const iconsList = [
-      Fa.FaUtensils,
-      Fa.FaBeerMugEmpty,
-      Fa.FaBurger,
-      Fa.FaPizzaSlice,
-      Fa.FaCookie,
-      Fa.FaWineGlass,
-      Fa.FaGlassWater,
-      Fa.FaIceCream,
-    ];
+    const fetchFavoriteIcons = async () => {
+      try {
+        const res = await fetch('/api/icons');
+        const iconsData = res.ok ? await res.json() : [];
 
-    const generated = Array.from({ length: 18 }).map((_, idx) => {
-      const IconComponent = iconsList[Math.floor(Math.random() * iconsList.length)];
-      return {
-        id: idx,
-        IconComponent,
-        left: `${Math.random() * 90 + 5}%`,
-        top: `${Math.random() * 90 + 5}%`,
-        size: `${Math.random() * 1.5 + 1.2}rem`,
-        duration: `${Math.random() * 20 + 20}s`, // Pomalé plynutí (20s - 40s)
-        delay: `${Math.random() * -40}s`, // Spuštění v náhodném čase animace
-        opacity: Math.random() * 0.58 + 0.24, // Velmi jemná viditelnost na pozadí
-      };
-    });
-    setFloatingIcons(generated);
+        // Fallback pokud není k dispozici žádná oblíbená ikona
+        const finalIconNames = iconsData.length > 0 ? iconsData : [
+          "FaUtensils",
+          "FaBeerMugEmpty",
+          "FaBurger",
+          "FaPizzaSlice",
+          "FaCookie",
+          "FaWineGlass",
+          "FaGlassWater",
+          "FaIceCream"
+        ];
+
+        const iconsList = finalIconNames
+          .map((name: string) => (Fa as any)[name])
+          .filter(Boolean);
+
+        const generated = Array.from({ length: 30 }).map((_, idx) => {
+          const IconComponent = iconsList[Math.floor(Math.random() * iconsList.length)];
+          return {
+            id: idx,
+            IconComponent,
+            left: `${Math.random() * 90 + 5}%`,
+            top: `${Math.random() * 90 + 5}%`,
+            size: `${Math.random() * 1.5 + 1.2}rem`,
+            duration: `${Math.random() * 20 + 20}s`, // Pomalé plynutí (20s - 40s)
+            delay: `${Math.random() * -40}s`, // Spuštění v náhodném čase animace
+            opacity: Math.random() * 0.58 + 0.24, // Zachovat uživatelskou nastavenou opacitu
+          };
+        });
+        setFloatingIcons(generated);
+        setFavoriteIconNames(finalIconNames);
+      } catch (err) {
+        console.error('Chyba při načítání oblíbených ikon:', err);
+      }
+    };
+
+    fetchFavoriteIcons();
   }, []);
+
+  // Spuštění ohňostroje při úspěšné platbě ( completed )
+  useEffect(() => {
+    if (state.status === 'completed') {
+      const list = favoriteIconNames.length > 0 ? favoriteIconNames : [
+        "FaUtensils",
+        "FaBeerMugEmpty",
+        "FaBurger",
+        "FaPizzaSlice",
+        "FaCookie",
+        "FaWineGlass",
+        "FaGlassWater",
+        "FaIceCream"
+      ];
+
+      const newParticles = Array.from({ length: 45 }).map((_, idx) => {
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 250 + 100; // Dolet částice
+        const x = Math.cos(angle) * velocity;
+        const y = Math.sin(angle) * velocity;
+        const size = Math.random() * 1.5 + 1.2; // Velikost ikony
+        const delay = Math.random() * 0.3; // Rozptyl spuštění
+        const duration = Math.random() * 1.6 + 2.2; // Doba trvání letu (1.2s - 1.8s)
+        const iconName = list[Math.floor(Math.random() * list.length)];
+        return {
+          id: idx,
+          iconName,
+          x,
+          y,
+          size,
+          delay,
+          duration,
+        };
+      });
+      setParticles(newParticles);
+    } else {
+      setParticles([]);
+    }
+  }, [state.status, favoriteIconNames]);
 
   // Načtení nastavení obchodu při startu pro zobrazení názvu
   useEffect(() => {
@@ -124,8 +182,28 @@ export default function CustomerDisplayPage() {
     return (
       <div className="success-screen">
         <style dangerouslySetInnerHTML={{ __html: styles }} />
-        <div className="success-icon">
-          <Fa.FaCircleCheck />
+        <div className="success-icon-container">
+          <div className="success-icon">
+            <Fa.FaCircleCheck />
+          </div>
+          {particles.map((p) => {
+            const Icon = (Fa as any)[p.iconName] || Fa.FaCircleCheck;
+            return (
+              <div
+                key={p.id}
+                className="particle-icon"
+                style={{
+                  fontSize: `${p.size}rem`,
+                  '--p-x': `${p.x}px`,
+                  '--p-y': `${p.y}px`,
+                  '--p-duration': `${p.duration}s`,
+                  '--p-delay': `${p.delay}s`,
+                } as React.CSSProperties}
+              >
+                <Icon />
+              </div>
+            );
+          })}
         </div>
         <h1 className="success-title">Děkujeme za nákup!</h1>
         <p className="success-subtitle">Přejeme Vám hezký den.</p>
@@ -361,11 +439,48 @@ const styles = `
   animation: fadeIn 0.5s ease-out;
 }
 
+.success-icon-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
 .success-icon {
   font-size: 6rem;
   color: #10b981;
-  margin-bottom: 2rem;
+  z-index: 10;
   animation: scaleBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.particle-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: explode var(--p-duration) cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  animation-delay: var(--p-delay);
+  opacity: 0;
+  color: var(--success);
+  z-index: 5;
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--p-x)), calc(-50% + var(--p-y))) scale(1.3) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 .success-title {
