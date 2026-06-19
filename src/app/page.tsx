@@ -106,6 +106,35 @@ export default function PosPage() {
     return `http://api.paylibo.com/paylibo/generator/image?${params.toString()}`;
   }, [generalSettings, total, receipt]);
 
+  // --- Synchronizace s klientským displejem ---
+  useEffect(() => {
+    const syncCustomerDisplay = async () => {
+      try {
+        console.log('[POS Sync] Syncing state to customer display: receipt items =', receipt.length);
+        const res = await fetch('/api/customer-display/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            receipt,
+            activeTab,
+            showQRModal,
+            spaydString,
+            externalQrUrl,
+            status: savedModalOpen ? 'completed' : 'pending',
+          })
+        });
+        if (res.ok) {
+          console.log('[POS Sync] Successfully updated customer display state.');
+        } else {
+          console.warn('[POS Sync] Failed to update customer display:', res.status, await res.text());
+        }
+      } catch (err) {
+        console.error('[POS Sync] Error syncing customer display:', err);
+      }
+    };
+    syncCustomerDisplay();
+  }, [receipt, activeTab, showQRModal, spaydString, externalQrUrl, savedModalOpen]);
+
   // --- Custom Item Logic ---
   const addCustomItem = () => {
     const name = customName.trim();

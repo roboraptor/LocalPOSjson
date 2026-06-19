@@ -8,6 +8,10 @@ export default function Header() {
   const [expanded, setExpanded] = useState(false);
   const pathname = usePathname();
 
+  if (pathname === '/cd' || pathname === '/customer-display') {
+    return null;
+  }
+
   const navLinks = [
     { href: '/', label: 'Pokladna' },
     { href: '/items', label: 'Položky' },
