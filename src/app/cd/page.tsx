@@ -27,7 +27,7 @@ export default function CustomerDisplayPage() {
     status: 'pending',
   });
 
-  const [shopName, setShopName] = useState<string>('EffortUp Bar');
+  const [shopName, setShopName] = useState<string>('EffortUp');
   const [floatingIcons, setFloatingIcons] = useState<any[]>([]);
 
   // Generování plovoucích ikon na pozadí
