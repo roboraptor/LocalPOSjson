@@ -31,6 +31,7 @@ export default function CustomerDisplayPage() {
   const [floatingIcons, setFloatingIcons] = useState<any[]>([]);
   const [favoriteIconNames, setFavoriteIconNames] = useState<string[]>([]);
   const [particles, setParticles] = useState<any[]>([]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Generování plovoucích ikon na pozadí
   useEffect(() => {
@@ -173,6 +174,30 @@ export default function CustomerDisplayPage() {
     };
   }, []);
 
+  // Sledování stavu fullscreenu
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error('Chyba při vstupu do fullscreen režimu:', err);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
   const receipt = state?.receipt || [];
   const total = receipt.reduce((sum, item) => sum + (item?.price || 0), 0);
   const hasItems = receipt.length > 0;
@@ -182,6 +207,13 @@ export default function CustomerDisplayPage() {
     return (
       <div className="success-screen">
         <style dangerouslySetInnerHTML={{ __html: styles }} />
+        <button
+          onClick={toggleFullscreen}
+          className="fullscreen-btn"
+          title={isFullscreen ? "Ukončit celou obrazovku" : "Celá obrazovka"}
+        >
+          {isFullscreen ? <Fa.FaCompress /> : <Fa.FaExpand />}
+        </button>
         <div className="success-icon-container">
           <div className="success-icon">
             <Fa.FaCircleCheck />
@@ -214,6 +246,13 @@ export default function CustomerDisplayPage() {
   return (
     <div className="display-container">
       <style dangerouslySetInnerHTML={{ __html: styles }} />
+      <button
+        onClick={toggleFullscreen}
+        className="fullscreen-btn"
+        title={isFullscreen ? "Ukončit celou obrazovku" : "Celá obrazovka"}
+      >
+        {isFullscreen ? <Fa.FaCompress /> : <Fa.FaExpand />}
+      </button>
 
       {!hasItems ? (
         // 2. Welcome obrazovka (prázdný košík)
@@ -242,7 +281,7 @@ export default function CustomerDisplayPage() {
               <Fa.FaUtensils />
             </div>
             <h1 className="welcome-title">{shopName}</h1>
-            <p className="welcome-subtitle">Vítejte! Objednejte si prosím u pokladny.</p>
+            <p className="welcome-subtitle">Vítejte! Objednejte si prosím.</p>
           </div>
         </div>
       ) : (
@@ -549,5 +588,29 @@ const styles = `
   100% {
     transform: translate(0, 0) rotate(360deg);
   }
+}
+
+.fullscreen-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }
 `;
