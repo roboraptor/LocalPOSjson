@@ -594,9 +594,9 @@ const styles = `
   position: absolute;
   top: 15px;
   right: 15px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.03);
   padding: 10px;
   border-radius: 50%;
   cursor: pointer;
