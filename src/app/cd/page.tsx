@@ -335,7 +335,7 @@ const styles = `
 .display-container {
   display: flex;
   width: 100vw;
-  height: calc(100vh - var(--header-h, 0px));
+  height: 100dvh;
   background-color: #000;
   overflow: hidden;
   color: #fff;
@@ -471,7 +471,7 @@ const styles = `
   justify-content: center;
   align-items: center;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   background: radial-gradient(circle at center, #022c22 0%, #020617 100%);
   color: #fff;
   z-index: 2000;
@@ -608,9 +608,9 @@ const styles = `
 }
 
 .fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);
 }
 `;
