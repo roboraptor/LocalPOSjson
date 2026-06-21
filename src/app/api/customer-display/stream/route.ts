@@ -1,8 +1,8 @@
 // c:\projects\LocalPOSjson\src\app\api\customer-display\stream\route.ts
-import { NextRequest } from 'next/server';
-import { addClient, removeClient } from '@/lib/customerState';
+import { NextRequest } from "next/server";
+import { addClient, removeClient } from "@/lib/customerState";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   let controller: ReadableStreamDefaultController | null = null;
@@ -16,16 +16,16 @@ export async function GET(req: NextRequest) {
       if (controller) {
         removeClient(controller);
       }
-    }
+    },
   });
 
   return new Response(stream, {
     headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache, no-transform',
-      'Connection': 'keep-alive',
-      'X-Accel-Buffering': 'no',
-      'Content-Encoding': 'none',
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
+      "Content-Encoding": "none",
     },
   });
 }

@@ -1,12 +1,12 @@
 // c:\projects\LocalPOSjson\src\app\cd\page.tsx
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import * as Fa from 'react-icons/fa6';
-import { QRCodeSVG } from 'qrcode.react';
-import { Item } from '@/types/db';
+import { useState, useEffect } from "react";
+import * as Fa from "react-icons/fa6";
+import { QRCodeSVG } from "qrcode.react";
+import { Item } from "@/types/db";
 
-const czk = new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' });
+const czk = new Intl.NumberFormat("cs-CZ", { style: "currency", currency: "CZK" });
 
 interface CustomerState {
   receipt: Item[];
@@ -14,7 +14,7 @@ interface CustomerState {
   showQRModal: boolean;
   spaydString: string;
   externalQrUrl: string | null;
-  status: 'pending' | 'completed';
+  status: "pending" | "completed";
 }
 
 export default function CustomerDisplayPage() {
@@ -22,12 +22,12 @@ export default function CustomerDisplayPage() {
     receipt: [],
     activeTab: null,
     showQRModal: false,
-    spaydString: '',
+    spaydString: "",
     externalQrUrl: null,
-    status: 'pending',
+    status: "pending",
   });
 
-  const [shopName, setShopName] = useState<string>('EffortUp');
+  const [shopName, setShopName] = useState<string>("EffortUp");
   const [floatingIcons, setFloatingIcons] = useState<any[]>([]);
   const [favoriteIconNames, setFavoriteIconNames] = useState<string[]>([]);
   const [particles, setParticles] = useState<any[]>([]);
@@ -37,24 +37,25 @@ export default function CustomerDisplayPage() {
   useEffect(() => {
     const fetchFavoriteIcons = async () => {
       try {
-        const res = await fetch('/api/icons');
+        const res = await fetch("/api/icons");
         const iconsData = res.ok ? await res.json() : [];
 
         // Fallback pokud není k dispozici žádná oblíbená ikona
-        const finalIconNames = iconsData.length > 0 ? iconsData : [
-          "FaUtensils",
-          "FaBeerMugEmpty",
-          "FaBurger",
-          "FaPizzaSlice",
-          "FaCookie",
-          "FaWineGlass",
-          "FaGlassWater",
-          "FaIceCream"
-        ];
+        const finalIconNames =
+          iconsData.length > 0
+            ? iconsData
+            : [
+                "FaUtensils",
+                "FaBeerMugEmpty",
+                "FaBurger",
+                "FaPizzaSlice",
+                "FaCookie",
+                "FaWineGlass",
+                "FaGlassWater",
+                "FaIceCream",
+              ];
 
-        const iconsList = finalIconNames
-          .map((name: string) => (Fa as any)[name])
-          .filter(Boolean);
+        const iconsList = finalIconNames.map((name: string) => (Fa as any)[name]).filter(Boolean);
 
         const generated = Array.from({ length: 30 }).map((_, idx) => {
           const IconComponent = iconsList[Math.floor(Math.random() * iconsList.length)];
@@ -72,7 +73,7 @@ export default function CustomerDisplayPage() {
         setFloatingIcons(generated);
         setFavoriteIconNames(finalIconNames);
       } catch (err) {
-        console.error('Chyba při načítání oblíbených ikon:', err);
+        console.error("Chyba při načítání oblíbených ikon:", err);
       }
     };
 
@@ -81,17 +82,20 @@ export default function CustomerDisplayPage() {
 
   // Spuštění ohňostroje při úspěšné platbě ( completed )
   useEffect(() => {
-    if (state.status === 'completed') {
-      const list = favoriteIconNames.length > 0 ? favoriteIconNames : [
-        "FaUtensils",
-        "FaBeerMugEmpty",
-        "FaBurger",
-        "FaPizzaSlice",
-        "FaCookie",
-        "FaWineGlass",
-        "FaGlassWater",
-        "FaIceCream"
-      ];
+    if (state.status === "completed") {
+      const list =
+        favoriteIconNames.length > 0
+          ? favoriteIconNames
+          : [
+              "FaUtensils",
+              "FaBeerMugEmpty",
+              "FaBurger",
+              "FaPizzaSlice",
+              "FaCookie",
+              "FaWineGlass",
+              "FaGlassWater",
+              "FaIceCream",
+            ];
 
       const newParticles = Array.from({ length: 45 }).map((_, idx) => {
         const angle = Math.random() * Math.PI * 2;
@@ -122,7 +126,7 @@ export default function CustomerDisplayPage() {
   useEffect(() => {
     const fetchGeneral = async () => {
       try {
-        const res = await fetch('/api/general');
+        const res = await fetch("/api/general");
         if (res.ok) {
           const data = await res.json();
           if (data.organization_name) {
@@ -130,7 +134,7 @@ export default function CustomerDisplayPage() {
           }
         }
       } catch (err) {
-        console.error('Nepodařilo se načíst název obchodu:', err);
+        console.error("Nepodařilo se načíst název obchodu:", err);
       }
     };
     fetchGeneral();
@@ -141,25 +145,28 @@ export default function CustomerDisplayPage() {
     let eventSource: EventSource;
 
     function connect() {
-      console.log('[SSE Client] Connecting to /api/customer-display/stream...');
-      eventSource = new EventSource('/api/customer-display/stream');
+      console.log("[SSE Client] Connecting to /api/customer-display/stream...");
+      eventSource = new EventSource("/api/customer-display/stream");
 
       eventSource.onopen = () => {
-        console.log('[SSE Client] Connection opened successfully!');
+        console.log("[SSE Client] Connection opened successfully!");
       };
 
       eventSource.onmessage = (event) => {
         try {
-          console.log('[SSE Client] Received state update:', event.data);
+          console.log("[SSE Client] Received state update:", event.data);
           const data = JSON.parse(event.data);
           setState(data);
         } catch (err) {
-          console.error('[SSE Client] Chyba při parsování SSE zprávy:', err);
+          console.error("[SSE Client] Chyba při parsování SSE zprávy:", err);
         }
       };
 
       eventSource.onerror = (err) => {
-        console.error('[SSE Client] SSE spojení ztraceno. Zkouším se znovu připojit za 2 sekundy...', err);
+        console.error(
+          "[SSE Client] SSE spojení ztraceno. Zkouším se znovu připojit za 2 sekundy...",
+          err,
+        );
         eventSource.close();
         setTimeout(connect, 2000);
       };
@@ -180,16 +187,16 @@ export default function CustomerDisplayPage() {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, []);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch((err) => {
-        console.error('Chyba při vstupu do fullscreen režimu:', err);
+        console.error("Chyba při vstupu do fullscreen režimu:", err);
       });
     } else {
       if (document.exitFullscreen) {
@@ -203,7 +210,7 @@ export default function CustomerDisplayPage() {
   const hasItems = receipt.length > 0;
 
   // 1. Děkovná obrazovka po úspěšném zaplacení
-  if (state.status === 'completed') {
+  if (state.status === "completed") {
     return (
       <div className="success-screen">
         <style dangerouslySetInnerHTML={{ __html: styles }} />
@@ -224,13 +231,15 @@ export default function CustomerDisplayPage() {
               <div
                 key={p.id}
                 className="particle-icon"
-                style={{
-                  fontSize: `${p.size}rem`,
-                  '--p-x': `${p.x}px`,
-                  '--p-y': `${p.y}px`,
-                  '--p-duration': `${p.duration}s`,
-                  '--p-delay': `${p.delay}s`,
-                } as React.CSSProperties}
+                style={
+                  {
+                    fontSize: `${p.size}rem`,
+                    "--p-x": `${p.x}px`,
+                    "--p-y": `${p.y}px`,
+                    "--p-duration": `${p.duration}s`,
+                    "--p-delay": `${p.delay}s`,
+                  } as React.CSSProperties
+                }
               >
                 <Icon />
               </div>
@@ -263,14 +272,16 @@ export default function CustomerDisplayPage() {
               <div
                 key={item.id}
                 className="floating-icon"
-                style={{
-                  left: item.left,
-                  top: item.top,
-                  fontSize: item.size,
-                  '--float-duration': item.duration,
-                  '--float-delay': item.delay,
-                  '--float-opacity': item.opacity,
-                } as React.CSSProperties}
+                style={
+                  {
+                    left: item.left,
+                    top: item.top,
+                    fontSize: item.size,
+                    "--float-duration": item.duration,
+                    "--float-delay": item.delay,
+                    "--float-opacity": item.opacity,
+                  } as React.CSSProperties
+                }
               >
                 <Icon />
               </div>
@@ -289,13 +300,15 @@ export default function CustomerDisplayPage() {
         <div className="receipt-container">
           <div className="receipt">
             <h3 className="receipt__title">
-              Účtenka {state.activeTab && `(${state.activeTab.is_table ? 'Stůl' : 'Účet'}: ${state.activeTab.name})`}
+              Účtenka{" "}
+              {state.activeTab &&
+                `(${state.activeTab.is_table ? "Stůl" : "Účet"}: ${state.activeTab.name})`}
             </h3>
 
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+            <div style={{ flex: 1, overflowY: "auto" }}>
               {receipt.filter(Boolean).map((item, idx) => (
                 <div key={`${item.id || idx}-${idx}`} className="receipt__row">
-                  <span className="receipt__name">{item.name || 'Položka'}</span>
+                  <span className="receipt__name">{item.name || "Položka"}</span>
                   <span className="receipt__price">{czk.format(item.price || 0)}</span>
                 </div>
               ))}
@@ -313,7 +326,7 @@ export default function CustomerDisplayPage() {
       {state.showQRModal && state.spaydString && (
         <div className="modal-overlay">
           <div className="modal-card">
-            <h2 style={{ marginBottom: '1.5rem', fontWeight: 700 }}>QR Platba</h2>
+            <h2 style={{ marginBottom: "1.5rem", fontWeight: 700 }}>QR Platba</h2>
             <div className="qr-container">
               {state.externalQrUrl ? (
                 <img src={state.externalQrUrl} alt="QR Platba" width={256} height={256} />

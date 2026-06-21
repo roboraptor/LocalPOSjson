@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { NextRequest, NextResponse } from "next/server";
+import fs from "fs/promises";
+import path from "path";
 
-const ICONS_FILE_PATH = path.join(process.cwd(), 'src', 'data', 'favoriteIcons.json');
+const ICONS_FILE_PATH = path.join(process.cwd(), "src", "data", "favoriteIcons.json");
 
 export async function GET() {
   try {
-    const data = await fs.readFile(ICONS_FILE_PATH, 'utf-8');
+    const data = await fs.readFile(ICONS_FILE_PATH, "utf-8");
     const icons = JSON.parse(data);
     return NextResponse.json(icons);
   } catch (error: any) {
@@ -21,10 +21,10 @@ export async function POST(req: NextRequest) {
     const { icons } = body;
 
     if (!Array.isArray(icons)) {
-      return NextResponse.json({ error: 'Není pole.' }, { status: 400 });
+      return NextResponse.json({ error: "Není pole." }, { status: 400 });
     }
 
-    await fs.writeFile(ICONS_FILE_PATH, JSON.stringify(icons, null, 2), 'utf-8');
+    await fs.writeFile(ICONS_FILE_PATH, JSON.stringify(icons, null, 2), "utf-8");
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

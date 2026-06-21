@@ -11,6 +11,7 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 ## ✨ Features
 
 ### Point of Sale Interface
+
 - Clean, intuitive, and responsive POS interface.
 - Automatic grouping of items by categories.
 - Easy addition of custom items on the fly (e.g., outside the main menu).
@@ -18,6 +19,7 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - **QR Code Payments**: Instantly generate SPAYD QR codes for seamless bank transfers directly in the POS view.
 
 ### Data & Management
+
 - **Local SQLite Database**: All data (items, categories, receipts, settings) is stored locally. The database path is configured in `src/data/dbposition.json` (defaults to `data/pos.db`).
 - **Dynamic Database Reconnection**: Change the database path in the UI, and the app seamlessly switches to the new DB without needing a restart.
 - **Items & Categories Editor**: Manage your menu, assign React icons (with search and favorites), and organize items into custom categories using drag-and-drop.
@@ -25,6 +27,7 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - **Exporting**: Generate exports of receipts and export items/receipts to CSV.
 
 ### System Settings & Configuration
+
 - **Organization Settings**: Configure business name, address, VAT ID (IČO/DIČ).
 - **Payment Settings**: Setup your bank IBAN, Constant Symbol, and default messages for QR payments.
 - **Receipt Customization**: Configure custom headers and footers for printed/exported receipts.
@@ -62,12 +65,14 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - **Node.js** (v18 or newer recommended)
 - **npm** (or yarn/pnpm)
 
 ### Installation & Running
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
@@ -77,11 +82,13 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 
 3. **(Optional) Migrate legacy JSON data:**
    If you have old `data/items.json` or `data/receipts.json` and want to migrate them into the SQLite database:
+
    ```bash
    node scripts/migrate.js
    ```
 
 4. **Start the development server:**
+
    ```bash
    npm run dev
    ```
@@ -94,6 +101,7 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 ## ✅ Development Status / Roadmap
 
 ### Completed (V2 transition)
+
 - [x] Migrated from Next.js Pages router to App Router.
 - [x] Migrated from JSON file storage to SQLite (`better-sqlite3`).
 - [x] Centralized database path configuration in `src/data/dbposition.json`.
@@ -111,6 +119,7 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - [x] Log and distinguish payment methods in DB (Cash vs QR).
 
 ### Planned / TODOs
+
 - [ ] Direct thermal printer integration (e.g., ESC/POS).
 - [ ] Advanced dashboard analytics / daily summaries.
 - [ ] Restrict the "Price" fields strictly to numeric inputs / virtual numpad for touchscreens.
@@ -124,4 +133,3 @@ This project is licensed under the **ISC** license.
 ---
 
 👨‍💻 **Author:** roboraptor66
-

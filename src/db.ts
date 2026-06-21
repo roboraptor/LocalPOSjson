@@ -1,24 +1,24 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import fs from 'fs';
-import { Tab } from './types/db'; // Import typů, které jsme vytvořili výše
+import Database from "better-sqlite3";
+import path from "path";
+import fs from "fs";
+import { Tab } from "./types/db"; // Import typů, které jsme vytvořili výše
 
 // Helper to get the current configured path
 export function getDbPath() {
-  const configPath = path.join(process.cwd(), 'src', 'data', 'dbposition.json');
+  const configPath = path.join(process.cwd(), "src", "data", "dbposition.json");
   try {
-    const configContent = fs.readFileSync(configPath, 'utf8');
+    const configContent = fs.readFileSync(configPath, "utf8");
     const dbConfigPath = JSON.parse(configContent).dbPath;
     return path.resolve(process.cwd(), dbConfigPath);
   } catch (e) {
-    console.warn('Could not read dbposition.json, using default path: data/pos.db');
-    return path.resolve(process.cwd(), 'data/pos.db');
+    console.warn("Could not read dbposition.json, using default path: data/pos.db");
+    return path.resolve(process.cwd(), "data/pos.db");
   }
 }
 
 // Create .env from .env.example if it doesn't exist
-const envPath = path.resolve(process.cwd(), '.env');
-const envExamplePath = path.resolve(process.cwd(), '.env.example');
+const envPath = path.resolve(process.cwd(), ".env");
+const envExamplePath = path.resolve(process.cwd(), ".env.example");
 if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
   fs.copyFileSync(envExamplePath, envPath);
 }
@@ -28,7 +28,7 @@ let currentDbPath: string | null = null;
 
 export function getDb() {
   const expectedPath = getDbPath();
-  
+
   // If the path changed, close the old connection and reconnect
   if (db && currentDbPath !== expectedPath) {
     console.log(`Database path changed from ${currentDbPath} to ${expectedPath}. Reconnecting...`);
@@ -43,7 +43,8 @@ export function getDb() {
     }
     db = new Database(expectedPath);
     // Enable Write-Ahead Logging for better concurrency/performance
-    db.pragma('journal_mode = WAL');
+    db.pragma("journal_mode = WAL");
+    db.pragma("wal_autocheckpoint = 100");
     currentDbPath = expectedPath;
   }
   return db;
@@ -157,16 +158,40 @@ const dbProxy = new Proxy({} as any, {
   get: (_, prop) => {
     const database = getDb();
     if (!database) throw new Error("Database not initialized");
-    return typeof database[prop] === 'function' ? database[prop].bind(database) : database[prop];
-  }
+    return typeof database[prop] === "function" ? database[prop].bind(database) : database[prop];
+  },
 });
 
 // Initial call - wrap in try-catch to prevent app crash if DB fails to init
 try {
   initDb();
 } catch (error) {
-  console.error('Failed to initialize database:', error);
+  console.error("Failed to initialize database:", error);
 }
+
+function cleanupDb() {
+  if (db) {
+    try {
+      console.log("Shutting down database: merging WAL and closing connection...");
+      db.pragma("wal_checkpoint(TRUNCATE)");
+      db.close();
+      db = null;
+    } catch (e) {
+      console.error("Error closing database during cleanup:", e);
+    }
+  }
+}
+
+// Register cleanup handlers for clean process shutdown
+process.on("exit", cleanupDb);
+process.on("SIGINT", () => {
+  cleanupDb();
+  process.exit(0);
+});
+process.on("SIGTERM", () => {
+  cleanupDb();
+  process.exit(0);
+});
 
 export default dbProxy;
 
@@ -175,16 +200,20 @@ export default dbProxy;
 export const reindexTabs = (tabsList?: Tab[]) => {
   const database = getDb();
   if (!database) return;
-  
+
   return database.transaction((tabsListInner?: Tab[]) => {
     // 1. Načíst existující taby (seřadíme: Stoly -> Permanentní -> Ostatní dle času) pokud nejsou předány
-    const currentTabs = tabsListInner || database.prepare(`
+    const currentTabs =
+      tabsListInner ||
+      (database
+        .prepare(`
       SELECT * FROM tabs 
       ORDER BY is_table DESC, is_permanent DESC, created_at ASC
-    `).all() as Tab[];
+    `)
+        .all() as Tab[]);
 
     // 2. Smazat tabulku a resetovat autoincrement počítadlo
-    database.prepare('DELETE FROM tabs').run();
+    database.prepare("DELETE FROM tabs").run();
     database.prepare("DELETE FROM sqlite_sequence WHERE name = 'tabs'").run();
 
     // 3. Vložit zpátky s novými ID

@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import db from '@/db';
+import { NextRequest, NextResponse } from "next/server";
+import db from "@/db";
 
 export async function GET() {
   try {
-    const tabs = db.prepare('SELECT * FROM tabs ORDER BY is_table DESC, name ASC').all();
+    const tabs = db.prepare("SELECT * FROM tabs ORDER BY is_table DESC, name ASC").all();
     const parsed = tabs.map((t: any) => ({
       ...t,
-      items: JSON.parse(t.items || '[]')
+      items: JSON.parse(t.items || "[]"),
     }));
     return NextResponse.json(parsed);
   } catch (error: any) {
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         is_staff ? 1 : 0,
         now,
         now,
-        itemsStr
+        itemsStr,
       );
       return NextResponse.json({ success: true, id: info.lastInsertRowid });
     }
@@ -59,12 +59,12 @@ export async function DELETE(req: NextRequest) {
     const { id } = body;
 
     if (!id) {
-      return NextResponse.json({ error: 'Chybí ID tabu' }, { status: 400 });
+      return NextResponse.json({ error: "Chybí ID tabu" }, { status: 400 });
     }
 
-    const info = db.prepare('DELETE FROM tabs WHERE id = ?').run(id);
+    const info = db.prepare("DELETE FROM tabs WHERE id = ?").run(id);
     if (info.changes === 0) {
-       return NextResponse.json({ error: 'Tab nenalezen' }, { status: 404 });
+      return NextResponse.json({ error: "Tab nenalezen" }, { status: 404 });
     }
     return NextResponse.json({ success: true });
   } catch (error: any) {

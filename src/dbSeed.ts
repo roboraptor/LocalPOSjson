@@ -1,4 +1,4 @@
-import db from './db';
+import db from "./db";
 
 export function seedDb() {
   const seedData = {
@@ -11,19 +11,19 @@ export function seedDb() {
       currency: "CZK",
       trx_msg: "",
       trx_vs_enabled: 0,
-      trx_ks: "" ,
+      trx_ks: "",
       receipt_title: "Obchod",
       receipt_header: "",
       receipt_header_enabled: 0,
       receipt_footer: "Děkujeme za návštěvu",
       receipt_footer_enabled: 1,
       eet_enable: 0,
-      use_external_qr_api: 0
+      use_external_qr_api: 0,
     },
     categories: [
       { name: "Nápoje", color: "#22c55e", icon: "FaBeerMugEmpty", position: 1 },
       { name: "Jídlo", color: "#22c55e", icon: "FaBurger", position: 2 },
-      { name: "Ostatní", color: "#22c55e", icon: "FaCubes", position: 3 }
+      { name: "Ostatní", color: "#22c55e", icon: "FaCubes", position: 3 },
     ],
     items: [
       { name: "Kofola", price: 40, category: "Nápoje", icon: "FaBeerMugEmpty", position: 4 },
@@ -39,7 +39,7 @@ export function seedDb() {
       { name: "Kelímek", price: 80, category: "Ostatní", icon: "FaGlassWater", position: 17 },
       { name: "HotDog", price: 80, category: "Jídlo", icon: "FaDog", position: 12 },
       { name: "Burger", price: 120, category: "Jídlo", icon: "FaBurger", position: 11 },
-    ]
+    ],
   };
 
   const runSeed = db.transaction(() => {
@@ -54,30 +54,42 @@ export function seedDb() {
         eet_enable = ?, use_external_qr_api = ?
       WHERE id = 1
     `);
-    
+
     updateGeneral.run(
-      seedData.general.organization_name, seedData.general.organization_owner, seedData.general.organization_id,
-      seedData.general.organization_vat_id, seedData.general.bank_iban, seedData.general.trx_msg,
-      seedData.general.trx_vs_enabled, seedData.general.trx_ks, seedData.general.receipt_title,
-      seedData.general.receipt_header, seedData.general.receipt_header_enabled,
-      seedData.general.receipt_footer, seedData.general.receipt_footer_enabled,
-      seedData.general.eet_enable, seedData.general.use_external_qr_api
+      seedData.general.organization_name,
+      seedData.general.organization_owner,
+      seedData.general.organization_id,
+      seedData.general.organization_vat_id,
+      seedData.general.bank_iban,
+      seedData.general.trx_msg,
+      seedData.general.trx_vs_enabled,
+      seedData.general.trx_ks,
+      seedData.general.receipt_title,
+      seedData.general.receipt_header,
+      seedData.general.receipt_header_enabled,
+      seedData.general.receipt_footer,
+      seedData.general.receipt_footer_enabled,
+      seedData.general.eet_enable,
+      seedData.general.use_external_qr_api,
     );
 
     // Seed categories
-    const insertCategory = db.prepare('INSERT OR IGNORE INTO categories (name, color, icon, position) VALUES (@name, @color, @icon, @position)');
+    const insertCategory = db.prepare(
+      "INSERT OR IGNORE INTO categories (name, color, icon, position) VALUES (@name, @color, @icon, @position)",
+    );
     for (const cat of seedData.categories) {
       insertCategory.run(cat);
     }
 
     // Seed items
-    const insertItem = db.prepare('INSERT OR IGNORE INTO items (name, price, category, icon, position) VALUES (@name, @price, @category, @icon, @position)');
+    const insertItem = db.prepare(
+      "INSERT OR IGNORE INTO items (name, price, category, icon, position) VALUES (@name, @price, @category, @icon, @position)",
+    );
     for (const item of seedData.items) {
       insertItem.run(item);
     }
   });
 
   runSeed();
-  console.log('Database seeded with existing data successfully.');
+  console.log("Database seeded with existing data successfully.");
 }
-

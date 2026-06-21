@@ -1,15 +1,31 @@
-@import '@/components/pos.css';        /* POS specifika – katalogový grid, .btn-items, zvětšené dlaždice */
-@import '@/components/receipts.css';   /* styl pro stránku /receipts */
-@import '@/components/modal.css';      /* potvrzovací modal */
+@import "@/components/pos.css"; /* POS specifika – katalogový grid, .btn-items, zvětšené dlaždice */
+@import "@/components/receipts.css"; /* styl pro stránku /receipts */
+@import "@/components/modal.css"; /* potvrzovací modal */
 
 /* ================================
    0) CSS RESET + BASE
    ================================ */
-*, *::before, *::after { box-sizing: border-box; }
-html, body { height: 100%; scrollbar-gutter: stable;}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+  scrollbar-gutter: stable;
+}
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    "Apple Color Emoji",
+    "Segoe UI Emoji";
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -18,48 +34,74 @@ body {
 }
 
 /* Odkazy a focus */
-a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+a {
+  color: inherit;
+  text-decoration: none;
+}
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 
 /* Obrázky & typografie */
-img, svg, video, canvas { display: block; max-width: 100%; }
-h1,h2,h3,h4,h5,h6 { margin: 0 0 .5rem; line-height: 1.2; }
-p { margin: 0 0 1rem; }
-code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+p {
+  margin: 0 0 1rem;
+}
+code,
+pre {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+}
 
 /* ================================
    1) DESIGN TOKENS (proměnné)
    ================================ */
 :root {
   /* 1. Základní paleta (Dark Theme) */
-  --bg: #000000;            /* Pozadí stránky (Pure Black) */
-  --fg: #ffffff;            /* Hlavní text (White) */
-  --muted: #a3a3a3;         /* Sekundární text */
-  --body-bg: var(--bg);     /* Alias */
+  --bg: #000000; /* Pozadí stránky (Pure Black) */
+  --fg: #ffffff; /* Hlavní text (White) */
+  --muted: #a3a3a3; /* Sekundární text */
+  --body-bg: var(--bg); /* Alias */
 
   /* 2. Komponenty */
-  --surface: #222;       /* Karty, Header (Dark Gray) */
-  --surface-2: #444;     /* Inputy, tlačítka (Lighter Gray) */
-  --border: #555;        /* Ohraničení */
+  --surface: #222; /* Karty, Header (Dark Gray) */
+  --surface-2: #444; /* Inputy, tlačítka (Lighter Gray) */
+  --border: #555; /* Ohraničení */
   --header-bg: var(--surface);
 
   /* 3. Akční barvy */
-  --primary: #3b82f6;       /* Modrá */
+  --primary: #3b82f6; /* Modrá */
   --primary-600: #2563eb;
-  --success: #22c55e;       /* Zelená */
+  --success: #22c55e; /* Zelená */
   --success-700: #15803d;
-  --danger: #ef4444;        /* Červená */
+  --danger: #ef4444; /* Červená */
   --danger-700: #b91c1c;
-  --warning: #f59e0b;       /* Oranžová (Amber) */
+  --warning: #f59e0b; /* Oranžová (Amber) */
   --warning-700: #b45309;
   --info: #0ea5e9;
 
   /* Typografie & radius & shadow */
   --radius: 12px;
   --radius-sm: 8px;
-  --shadow-sm: 0 2px 6px rgba(0,0,0,.25);
-  --shadow-md: 0 6px 24px rgba(0,0,0,.24);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.24);
 
   /* Mezery (8px scale) */
   --sp-1: 4px;
@@ -74,7 +116,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   /* Tabular nums pro ceny */
   --tabular: tabular-nums lining-nums;
 
-  --header-h: 62px;  /* výška headeru */
+  --header-h: 62px; /* výška headeru */
 }
 
 /* Default Header Styling */
@@ -108,31 +150,88 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   max-width: 1400px;
 }
 
-.pageTitle { font-size: 28px; font-weight: 700; margin: var(--sp-2) 0 var(--sp-4); }
-
+.pageTitle {
+  font-size: 28px;
+  font-weight: 700;
+  margin: var(--sp-2) 0 var(--sp-4);
+}
 
 /* Obecný responzivní grid (zůstává v core) */
-.grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
-@media (min-width: 750px) { .grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 1400px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+@media (min-width: 750px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (min-width: 1400px) {
+  .grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
 
-.grid2 { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
-@media (min-width: 950px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+@media (min-width: 950px) {
+  .grid2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 
-.grid2-perma { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.grid2-perma {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
 
-.grid-tiny { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
-@media (min-width: 560px) { .grid-tiny { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 830px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr; } }
-@media (min-width: 1100px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr 1fr; } }
-@media (min-width: 1370px) { .grid-tiny { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; } }
+.grid-tiny {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+@media (min-width: 560px) {
+  .grid-tiny {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (min-width: 830px) {
+  .grid-tiny {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+@media (min-width: 1100px) {
+  .grid-tiny {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+@media (min-width: 1370px) {
+  .grid-tiny {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  }
+}
 
 .skeleton {
-  height: 140px; border-radius: var(--radius);
+  height: 140px;
+  border-radius: var(--radius);
   background: linear-gradient(90deg, #1d232e 25%, #2b3443 37%, #1d232e 63%);
-  background-size: 400% 100%; animation: shimmer 1.4s ease infinite; margin-bottom: var(--sp-4);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  margin-bottom: var(--sp-4);
 }
-@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
 
 /* ================================
    List Group
@@ -158,7 +257,6 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 }
 
 .list-group-item:last-child {
-
 }
 
 /* Interactive states */
@@ -182,16 +280,21 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 }
 
 /* Disabled state */
-.list-group-item.disabled, .list-group-item:disabled {
+.list-group-item.disabled,
+.list-group-item:disabled {
   color: var(--muted);
   pointer-events: none;
   background-color: var(--surface);
   opacity: 0.7;
 }
 
-
 /* Default Form Styling */
-.form-label,.form-check-label { font-weight: 600; color: var(--muted); font-size: 14px; }
+.form-label,
+.form-check-label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 14px;
+}
 
 .form-control,
 .form-select {
@@ -214,8 +317,12 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
   cursor: not-allowed;
 }
 .form-check-input {
-  width: 16px; height: 16px; border: 1px solid var(--border); border-radius: 4px;
-  background-color: var(--surface-2); color: var(--primary);
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--surface-2);
+  color: var(--primary);
 }
 .form-check-input:checked {
   background-color: var(--primary);
@@ -223,19 +330,53 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 }
 /* Tlačítka (základ) */
 .btn {
-  appearance: none; border: 1px solid transparent; border-radius: var(--radius-sm);
-  padding: 10px 14px; cursor: pointer; font-weight: 600;
-  background: var(--surface-2); color: var(--fg);
-  transition: transform .06s ease, filter .15s ease, background .15s ease;
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--surface-2);
+  color: var(--fg);
+  transition:
+    transform 0.06s ease,
+    filter 0.15s ease,
+    background 0.15s ease;
 }
-.btn:hover { filter: brightness(1.05); }
-.btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--primary); border-color: var(--primary-600); color: #fff; }
-.btn-success { background: var(--success); border-color: var(--success-700); color: #000; }
-.btn-danger  { background: var(--danger);  border-color: var(--danger-700);  color: #fff; }
-.btn-warning { background: var(--warning); border-color: var(--warning-700);  color: #000; }
-.btn-ghost   { background: var(--muted); color: var(--fg); border-color: var(--fg); }
-.btn-block   { width: 100%; }
+.btn:hover {
+  filter: brightness(1.05);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary-600);
+  color: #fff;
+}
+.btn-success {
+  background: var(--success);
+  border-color: var(--success-700);
+  color: #000;
+}
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger-700);
+  color: #fff;
+}
+.btn-warning {
+  background: var(--warning);
+  border-color: var(--warning-700);
+  color: #000;
+}
+.btn-ghost {
+  background: var(--muted);
+  color: var(--fg);
+  border-color: var(--fg);
+}
+.btn-block {
+  width: 100%;
+}
 
 .super-center {
   display: flex;
@@ -244,9 +385,35 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
 }
 
 /* Utilities */
-.cardPad { padding: var(--sp-4); }
-.formRow { display: grid; gap: var(--sp-2); margin-bottom: var(--sp-3); }
-.input { width: 100%; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface-2); color: var(--fg); }
-.input:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
-.badge { display: inline-block; padding: 2px 8px; font-size: 12px; border-radius: 8px; background: var(--primary); color: #fff; margin-left: 6px; }
-.badge-staff { background: var(--danger); }
+.cardPad {
+  padding: var(--sp-4);
+}
+.formRow {
+  display: grid;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--fg);
+}
+.input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  margin-left: 6px;
+}
+.badge-staff {
+  background: var(--danger);
+}

@@ -1,13 +1,13 @@
 // components/Modal.js
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 export default function Modal({ open, onClose, title, children }) {
   useEffect(() => {
     const closeOnEsc = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    document.addEventListener('keydown', closeOnEsc);
-    return () => document.removeEventListener('keydown', closeOnEsc);
+    document.addEventListener("keydown", closeOnEsc);
+    return () => document.removeEventListener("keydown", closeOnEsc);
   }, [onClose]);
 
   if (!open) return null;

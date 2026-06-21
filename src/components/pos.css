@@ -7,7 +7,6 @@
    - Komentáře k chování a důvodům voleb
    ================================================================== */
 
-
 /* ================================================================
    1) PROMĚNNÉ (POS scope)
    - Lze přepsat lokálně na kontejneru (např. .buttons.compact { ... })
@@ -15,11 +14,11 @@
    ================================================================ */
 :root {
   /* Rozměry dlaždic */
-  --item-min: 140px;                  /* min. šířka jedné dlaždice v gridu */
-  --item-max: 160px;                  /* max. šířka jedné dlaždice v gridu */
-  --item-row: 80px;                   /* výška řádku gridu (sjednocuje výšky) */
-  --item-pad: 6px;                   /* vnitřní odsazení obsahu tlačítka */
-  --item-icon: 20px;                  /* velikost čtverce pro ikonu uvnitř dlaždice */
+  --item-min: 140px; /* min. šířka jedné dlaždice v gridu */
+  --item-max: 160px; /* max. šířka jedné dlaždice v gridu */
+  --item-row: 80px; /* výška řádku gridu (sjednocuje výšky) */
+  --item-pad: 6px; /* vnitřní odsazení obsahu tlačítka */
+  --item-icon: 20px; /* velikost čtverce pro ikonu uvnitř dlaždice */
 
   /* Základní typografie pro tlačítko */
   --item-font: clamp(0.95rem, 1.8vw, 1.1rem);
@@ -29,7 +28,7 @@
 
   --item-title-font: clamp(1rem, 2.1vw, 1.25rem);
   --item-title-weight: 600;
-  --item-title-lines: 2;             /* 2–3 podle potřeby */
+  --item-title-lines: 2; /* 2–3 podle potřeby */
   --item-title-tracking: 0;
 
   --item-price-font: clamp(1.05rem, 2.4vw, 1.3rem);
@@ -38,29 +37,82 @@
 }
 
 /* Hlavní dvousloupcový layout pro pokladnu */
-.mainLayout { display: flex; flex-grow: 1; min-height: calc(100dvh - var(--header-h)); }
-.leftColumn { flex: 1; padding: var(--sp-2) var(--sp-6); overflow-y: auto; }
+.mainLayout {
+  display: flex;
+  flex-grow: 1;
+  min-height: calc(100dvh - var(--header-h));
+}
+.leftColumn {
+  flex: 1;
+  padding: var(--sp-2) var(--sp-6);
+  overflow-y: auto;
+}
 .receiptColumn {
-  width: 400px; background: var(--surface); color: var(--fg);
-  border-left: 1px solid var(--border); padding: var(--sp-6);
-  position: sticky; top: 0; overflow-y: auto;
-  box-shadow: -6px 0 16px rgba(0,0,0,.12);
+  width: 400px;
+  background: var(--surface);
+  color: var(--fg);
+  border-left: 1px solid var(--border);
+  padding: var(--sp-6);
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  box-shadow: -6px 0 16px rgba(0, 0, 0, 0.12);
   height: calc(100dvh - var(--header-h));
 }
 .receipt {
-  display: flex; flex-direction: column; gap: var(--sp-2);
-  background: #fff; color: #111827;
-  padding: var(--sp-5); border: 1px dashed #cbd5e1; border-radius: var(--radius-sm);
-  box-shadow: 0 0 0 1px #e5e7eb inset, 0 6px 14px rgba(0,0,0,.06);
-  font-feature-settings: "tnum"; font-variant-numeric: var(--tabular);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  background: #fff;
+  color: #111827;
+  padding: var(--sp-5);
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--radius-sm);
+  box-shadow:
+    0 0 0 1px #e5e7eb inset,
+    0 6px 14px rgba(0, 0, 0, 0.06);
+  font-feature-settings: "tnum";
+  font-variant-numeric: var(--tabular);
 }
-.receipt__title { margin: 0 0 var(--sp-3); font-size: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: var(--sp-2); font-weight: 700; }
-.receipt__row { display: flex; justify-content: space-between; gap: var(--sp-4); padding: 6px 0; border-bottom: 1px dashed #e5e7eb; font-size: 16px; }
-.receipt__row:last-child { border-bottom: none; }
-.receipt__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.receipt__price { font-variant-numeric: var(--tabular); }
-.receipt__total { margin-top: var(--sp-3); display: flex; justify-content: space-between; border-top: 2px solid #111827; padding-top: var(--sp-2); font-weight: 800; font-size: 18px; }
-.receipt__meta { color: #6b7280; font-size: 12px; }
+.receipt__title {
+  margin: 0 0 var(--sp-3);
+  font-size: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: var(--sp-2);
+  font-weight: 700;
+}
+.receipt__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: 6px 0;
+  border-bottom: 1px dashed #e5e7eb;
+  font-size: 16px;
+}
+.receipt__row:last-child {
+  border-bottom: none;
+}
+.receipt__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt__price {
+  font-variant-numeric: var(--tabular);
+}
+.receipt__total {
+  margin-top: var(--sp-3);
+  display: flex;
+  justify-content: space-between;
+  border-top: 2px solid #111827;
+  padding-top: var(--sp-2);
+  font-weight: 800;
+  font-size: 18px;
+}
+.receipt__meta {
+  color: #6b7280;
+  font-size: 12px;
+}
 
 /* ================================================================
    2) GRID KONTEJNER KATALOGU
@@ -76,8 +128,11 @@
   align-items: stretch;
   max-width: 100%;
 }
-.sectionTitle { font-size: 18px; font-weight: 700; margin: var(--sp-2) 0 var(--sp-2); }
-
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: var(--sp-2) 0 var(--sp-2);
+}
 
 /* ================================================================
    3) ZÁKLAD KATALOGOVÉHO TLAČÍTKA
@@ -86,12 +141,12 @@
    ================================================================ */
 .btn-items {
   display: grid;
-  grid-template-rows: 1fr auto;       /* 1) vršek, 2) spodní lišta (může být prázdná) */
+  grid-template-rows: 1fr auto; /* 1) vršek, 2) spodní lišta (může být prázdná) */
   gap: 6px;
   align-items: center;
   justify-items: start;
   width: 100%;
-  min-height: var(--item-row);        /* sladěno s grid-auto-rows */
+  min-height: var(--item-row); /* sladěno s grid-auto-rows */
   padding: var(--item-pad) var(--sp-4);
   border-radius: var(--radius-sm);
 
@@ -111,7 +166,6 @@
   transform: none;
 }
 
-
 /* ================================================================
    4) VNITŘNÍ LAYOUT (výchozí, ne-tri)
    - Horní řádek: ikona + název ve 2 sloupcích
@@ -119,7 +173,7 @@
    ================================================================ */
 
 .btn-items__icon {
-  color:rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.4);
   width: var(--item-icon);
   height: var(--item-icon);
   display: grid;
@@ -148,7 +202,6 @@
   max-height: calc(1.25em * var(--item-title-lines));
 }
 
-
 .btn-items__price {
   /* Společné vlastnosti ceny (platí i v tri-layoutu) */
   font-variant-numeric: var(--tabular);
@@ -160,7 +213,6 @@
   /* V default layoutu chceme cenu často vpravo */
   margin-left: auto;
 }
-
 
 /* ================================================================
    5) VARIANTY VELIKOSTI / ZAROVNÁNÍ (modifier třídy)
@@ -186,7 +238,7 @@
   --item-text-align: center;
 }
 .btn-items.center .btn-items__top {
-  grid-template-columns: 1fr;     /* ikonu můžeš přesunout nad titulek nebo skrýt */
+  grid-template-columns: 1fr; /* ikonu můžeš přesunout nad titulek nebo skrýt */
 }
 .btn-items.center .btn-items__icon {
   margin-inline: auto;
@@ -199,7 +251,6 @@
   --item-title-lines: 3;
 }
 
-
 /* ================================================================
    6) SPECIÁLNÍ ROZVRH: TRI-LAYOUT
    - Název: levý horní roh
@@ -208,10 +259,10 @@
    - Použij na tlačítku className="btn-items btn-items--tri"
    ================================================================ */
 .btn-items--tri {
-  position: relative;                            /* umožní absolutní pozicování dětí */
-  min-height: var(--item-row);                   /* zachová jednotnou výšku dlaždice */
-  padding-right: calc(var(--sp-4) + 48px);       /* rezerva pro ikonu vpravo */
-  overflow: hidden;                              /* zamezí zobrazení ikony mimo okraj tlačítka */
+  position: relative; /* umožní absolutní pozicování dětí */
+  min-height: var(--item-row); /* zachová jednotnou výšku dlaždice */
+  padding-right: calc(var(--sp-4) + 48px); /* rezerva pro ikonu vpravo */
+  overflow: hidden; /* zamezí zobrazení ikony mimo okraj tlačítka */
 }
 
 /* Název – levý horní roh */
@@ -223,7 +274,7 @@
   white-space: nowrap;
   overflow: visible;
   text-overflow: ellipsis;
-  text-align: left;                             
+  text-align: left;
 }
 
 /* Cena – levý dolní roh */
@@ -231,7 +282,7 @@
   position: absolute;
   bottom: var(--item-pad);
   left: var(--sp-2);
-  margin-left: 0;                                 /* přepíšeme default (vpravo) */
+  margin-left: 0; /* přepíšeme default (vpravo) */
 }
 
 /* Ikona – pravá strana uprostřed */
@@ -240,18 +291,17 @@
   right: -13px;
   top: 50%;
   transform: translateY(-50%);
-  width: 60px;                                    /* můžeš upravit podle vkusu */
+  width: 60px; /* můžeš upravit podle vkusu */
   height: 60px;
   display: grid;
   place-items: center;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0);             /* transparentní, jak sis přál */
+  background: rgba(255, 255, 255, 0); /* transparentní, jak sis přál */
 }
 .btn-items--tri .btn-items__icon svg {
   width: 70%;
   height: 70%;
 }
-
 
 /* ================================================================
    7) RESPONZIVITA
