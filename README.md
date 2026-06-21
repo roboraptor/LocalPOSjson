@@ -17,13 +17,17 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - Easy addition of custom items on the fly (e.g., outside the main menu).
 - **Tabs & Tables management**: Ability to park/save an open receipt to a specific customer's "Tab" (Na účet) or "Table" (Na stůl).
 - **QR Code Payments**: Instantly generate SPAYD QR codes for seamless bank transfers directly in the POS view.
+- **External Customer Display (EBD)**: Real-time customer display screen (`/cd`) powered by Server-Sent Events (SSE) that broadcasts active transaction details, totals, and payment QR codes to a secondary monitor or client tablet. Supports fullscreen layout toggling.
 
 ### Data & Management
 
 - **Local SQLite Database**: All data (items, categories, receipts, settings) is stored locally. The database path is configured in `src/data/dbposition.json` (defaults to `data/pos.db`).
 - **Dynamic Database Reconnection**: Change the database path in the UI, and the app seamlessly switches to the new DB without needing a restart.
 - **Items & Categories Editor**: Manage your menu, assign React icons (with search and favorites), and organize items into custom categories using drag-and-drop.
-- **Receipts History**: Overview of all closed receipts with filtering.
+- **Unified Receipts & Open Tabs View**: Toggle between finalized receipts and active open tabs/tables on the Receipts page with real-time search and date filtering.
+- **Sales Closing Dashboard (Uzávěrka)**: Aggregates obrat (revenue), count, average ticket values, category shares, and platební metody (cash, card, QR, open tabs) with presets (today, yesterday, week, month) or custom date pickers.
+- **POS Thermal Printer Layouts**: Ready-made 80mm receipt templates for both document printouts and closing reports (which automatically divide statistics into PAID and UNPAID blocks).
+- **WAL Checkpointing (Truncation)**: Explicitly checkpoint and empty the SQLite WAL files back to the main database file in the Export settings.
 - **Exporting**: Generate exports of receipts and export items/receipts to CSV.
 
 ### System Settings & Configuration
@@ -117,11 +121,15 @@ The project is designed for small businesses, cafes, pubs, or as an experimental
 - [x] Hot-swappable database via ES6 Proxy (no restart needed on path change).
 - [x] Full removal of legacy files (obsolete Pages router and JSON DB logic).
 - [x] Log and distinguish payment methods in DB (Cash vs QR).
+- [x] Real-time External Browser Display (EBD / customer-display) using Server-Sent Events.
+- [x] Advanced dashboard analytics & daily summaries (**Uzávěrka** page).
+- [x] Unified closed receipts and active open tabs layout toggling.
+- [x] POS-ready thermal printer layouts (80mm width formatting) for bills and closing slips.
+- [x] WAL checkpointing & database connection leak fixes.
 
 ### Planned / TODOs
 
-- [ ] Direct thermal printer integration (e.g., ESC/POS).
-- [ ] Advanced dashboard analytics / daily summaries.
+- [ ] Direct ESC/POS protocol support (raw printer command sending over network/USB).
 - [ ] Restrict the "Price" fields strictly to numeric inputs / virtual numpad for touchscreens.
 
 ---
