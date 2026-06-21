@@ -197,14 +197,29 @@ export default function ReceiptsPage() {
 
   return (
     <div className="container">
-      <div className="d-flex justify-content-between align-items-center my-3">
+      {/* Print-only header */}
+      <div className="print-only" style={{ textAlign: "center", marginBottom: "20px" }}>
+        <h2 style={{ fontSize: 16, margin: "0 0 5px 0", fontWeight: "bold" }}>LocalPOSqlite</h2>
+        <div style={{ fontSize: 13, fontWeight: "bold" }}>
+          {viewMode === "receipts" ? "SEZNAM UZAVŘENÝCH ÚČTENEK" : "SEZNAM OTEVŘENÝCH ÚČTŮ"}
+        </div>
+        <div style={{ fontSize: 10, color: "#555" }}>
+          Tisk: {new Date().toLocaleString("cs-CZ")} • Dokladů: {filtered.length}
+        </div>
+        <div style={{ borderBottom: "2px solid black", marginTop: 10 }} />
+      </div>
+
+      <div className="d-flex justify-content-between align-items-center my-3 no-print">
         <h1 className="pageTitle my-0">
           {viewMode === "receipts" ? "Uložené účtenky" : "Aktivní otevřené účty"}
         </h1>
+        <button className="btn btn-primary d-flex align-items-center gap-2" onClick={() => window.print()}>
+          <Fa.FaPrint /> Tisk seznamu
+        </button>
       </div>
 
       {/* FILTRY */}
-      <section className="card mb-4" style={{ padding: "0.75rem" }}>
+      <section className="card mb-4 no-print" style={{ padding: "0.75rem" }}>
         <div className="grid2">
           <div
             style={{
@@ -374,7 +389,7 @@ export default function ReceiptsPage() {
 
       {viewMode === "receipts" && receipts.length > 0 && (
         <div
-          className="card cardPad"
+          className="card cardPad no-print"
           style={{
             marginBottom: 16,
             marginTop: 16,
@@ -397,6 +412,93 @@ export default function ReceiptsPage() {
           </div>
         </div>
       )}
+
+      {/* Embedded print styles */}
+      <style jsx global>{`
+        @media print {
+          /* Hide standard elements */
+          body, html {
+            background: white !important;
+            color: black !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .navbar {
+            display: none !important;
+          }
+          .print-only {
+            display: block !important;
+          }
+          .container {
+            width: 76mm !important;
+            max-width: 76mm !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+          }
+          .grid {
+            display: block !important;
+          }
+          .card.receiptCard {
+            border: none !important;
+            border-bottom: 1px dashed black !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            color: black !important;
+            padding: 8px 0 !important;
+            margin-bottom: 0 !important;
+            page-break-inside: avoid;
+          }
+          .receiptHeader {
+            border-bottom: none !important;
+            padding: 0 !important;
+            margin-bottom: 5px !important;
+            color: black !important;
+          }
+          .receiptTitle {
+            font-family: monospace;
+            font-size: 14px;
+            font-weight: bold;
+            color: black !important;
+          }
+          .receiptSub {
+            font-family: monospace;
+            font-size: 11px;
+            color: #333 !important;
+          }
+          .receiptBody {
+            font-family: monospace;
+            font-size: 12px;
+            gap: 2px !important;
+            margin-bottom: 5px !important;
+          }
+          .receiptRow {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: none !important;
+            padding: 0 !important;
+          }
+          .receiptTotal {
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: bold;
+            border-top: 1px dashed black !important;
+            padding-top: 3px !important;
+            display: flex;
+            justify-content: space-between;
+            color: black !important;
+          }
+          .totalPrice {
+            color: black !important;
+          }
+        }
+        @media screen {
+          .print-only {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
