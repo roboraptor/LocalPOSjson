@@ -3,7 +3,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import * as Fa from "react-icons/fa6";
-import Link from "next/link";
 import { Item } from "@/types/db";
 
 const czk = new Intl.NumberFormat("cs-CZ", { style: "currency", currency: "CZK" });
@@ -12,13 +11,28 @@ interface ParsedReceipt {
   id: number;
   created_at: string;
   issued_to: string | null;
-  items: Item[]; // API už vrací parsovaný JSON
+  items: Item[];
+}
+
+interface ParsedTab {
+  id: number;
+  name: string;
+  is_permanent: number;
+  is_table: number;
+  is_staff: number;
+  created_at: string;
+  updated_at: string;
+  items: Item[];
 }
 
 export default function ReceiptsPage() {
   const [receipts, setReceipts] = useState<ParsedReceipt[]>([]);
+  const [tabs, setTabs] = useState<ParsedTab[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // viewMode: 'receipts' (closed receipts) or 'tabs' (open tables/tabs)
+  const [viewMode, setViewMode] = useState<"receipts" | "tabs">("receipts");
 
   // ---- FILTRY ----
   const [q, setQ] = useState(""); // fulltext
@@ -26,37 +40,60 @@ export default function ReceiptsPage() {
   const [to, setTo] = useState(""); // YYYY-MM-DD
   const [issuedTo, setIssuedTo] = useState(""); // přesný match
 
-  useEffect(() => {
-    async function fetchReceipts() {
-      try {
-        setLoading(true);
-        setError(null);
-        // Nový endpoint
-        const res = await fetch("/api/receipts", { cache: "no-store" });
-        if (!res.ok) throw new Error("Nepodařilo se načíst účtenky");
-        const data = await res.json();
-        setReceipts(Array.isArray(data) ? data : []);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [receiptsRes, tabsRes] = await Promise.all([
+        fetch("/api/receipts", { cache: "no-store" }),
+        fetch("/api/tabs", { cache: "no-store" }),
+      ]);
+      if (!receiptsRes.ok) throw new Error("Nepodařilo se načíst účtenky");
+      if (!tabsRes.ok) throw new Error("Nepodařilo se načíst otevřené účty");
+
+      const receiptsData = await receiptsRes.json();
+      const tabsData = await tabsRes.json();
+
+      setReceipts(Array.isArray(receiptsData) ? receiptsData : []);
+      setTabs(Array.isArray(tabsData) ? tabsData : []);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    fetchReceipts();
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
-  const deleteReceipt = async (id: number) => {
-    if (!confirm("Opravdu chcete tuto účtenku smazat?")) return;
-    try {
-      const res = await fetch("/api/receipts", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      if (!res.ok) throw new Error("Nepodařilo se smazat účtenku");
-      setReceipts((prev) => prev.filter((r) => r.id !== id));
-    } catch (err: any) {
-      alert(err.message);
+  const deleteItem = async (id: number, isTab: boolean) => {
+    if (isTab) {
+      if (!confirm("Opravdu chcete tento otevřený účet smazat?")) return;
+      try {
+        const res = await fetch("/api/tabs", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        if (!res.ok) throw new Error("Nepodařilo se smazat otevřený účet");
+        setTabs((prev) => prev.filter((t) => t.id !== id));
+      } catch (err: any) {
+        alert(err.message);
+      }
+    } else {
+      if (!confirm("Opravdu chcete tuto účtenku smazat?")) return;
+      try {
+        const res = await fetch("/api/receipts", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        if (!res.ok) throw new Error("Nepodařilo se smazat účtenku");
+        setReceipts((prev) => prev.filter((r) => r.id !== id));
+      } catch (err: any) {
+        alert(err.message);
+      }
     }
   };
 
@@ -75,13 +112,15 @@ export default function ReceiptsPage() {
     }
   };
 
-  // Unikátní seznam "issued_to" pro rychlý filtr
+  // Unikátní seznam pro rychlý filtr podle jména (issued_to u účtenek, name u tabů)
   const issuedToOptions = useMemo(() => {
-    const set = new Set(receipts.map((r) => (r.issued_to ?? "").trim()).filter(Boolean));
+    const dataset = viewMode === "receipts" ? receipts : tabs;
+    const names = dataset.map((d: any) => (viewMode === "receipts" ? d.issued_to : d.name));
+    const set = new Set(names.map((n) => (n ?? "").trim()).filter(Boolean));
     return Array.from(set).sort((a, b) => a.localeCompare(b, "cs"));
-  }, [receipts]);
+  }, [receipts, tabs, viewMode]);
 
-  // --- seřazení & filtrování (nejnovější nahoře) ---
+  // --- seřazení & filtrování ---
   const filtered = useMemo(() => {
     const toTs = (d: string) => {
       if (!d) return 0;
@@ -90,41 +129,56 @@ export default function ReceiptsPage() {
     };
 
     const fromBound = from ? new Date(`${from}T00:00:00`).getTime() : null;
-    const toBound = to ? new Date(`T23:59:59`).getTime() : null;
+    const toBound = to ? new Date(`${to}T23:59:59`).getTime() : null;
 
-    return (
-      [...receipts]
-        // sort desc by created_at (nejnovější první)
-        .sort((a, b) => toTs(b?.created_at) - toTs(a?.created_at))
-        // apply filters
-        .filter((r) => {
-          const created = toTs(r?.created_at);
+    const dataset =
+      viewMode === "receipts"
+        ? receipts.map((r) => ({
+            id: r.id,
+            created_at: r.created_at,
+            issued_to: r.issued_to,
+            items: r.items,
+            isTab: false,
+            is_table: false,
+          }))
+        : tabs.map((t) => ({
+            id: t.id,
+            created_at: t.created_at,
+            issued_to: t.name,
+            items: t.items,
+            isTab: true,
+            is_table: t.is_table === 1 || (t.is_table as any) === true,
+          }));
 
-          if (fromBound && Number.isFinite(fromBound) && created < fromBound) return false;
-          if (toBound && Number.isFinite(toBound) && created > toBound) return false;
+    return [...dataset]
+      .sort((a, b) => toTs(b?.created_at) - toTs(a?.created_at))
+      .filter((r) => {
+        const created = toTs(r?.created_at);
 
-          // Ensure strict string comparison for filtering
-          if (issuedTo && String(r?.issued_to ?? "").trim() !== String(issuedTo).trim())
-            return false;
+        if (fromBound && Number.isFinite(fromBound) && created < fromBound) return false;
+        if (toBound && Number.isFinite(toBound) && created > toBound) return false;
 
-          if (q) {
-            const id = String(r?.id ?? "");
-            const person = String(r?.issued_to ?? "");
-            const itemsText = (r?.items || []).map((it) => String(it?.name ?? "")).join(" ");
-            const hay = `${id} ${person} ${itemsText}`.toLowerCase();
-            if (!hay.includes(q.toLowerCase())) return false;
-          }
+        if (issuedTo && String(r?.issued_to ?? "").trim() !== String(issuedTo).trim()) return false;
 
-          return true;
-        })
-    );
-  }, [receipts, q, from, to, issuedTo]);
+        if (q) {
+          const id = String(r?.id ?? "");
+          const person = String(r?.issued_to ?? "");
+          const itemsText = (r?.items || []).map((it) => String(it?.name ?? "")).join(" ");
+          const hay = `${id} ${person} ${itemsText}`.toLowerCase();
+          if (!hay.includes(q.toLowerCase())) return false;
+        }
+
+        return true;
+      });
+  }, [receipts, tabs, viewMode, q, from, to, issuedTo]);
 
   if (loading) {
     return (
       <div className="container">
         <div className="d-flex justify-content-between align-items-center my-3">
-          <h1 className="pageTitle my-0">Uložené účtenky</h1>
+          <h1 className="pageTitle my-0">
+            {viewMode === "receipts" ? "Uložené účtenky" : "Aktivní otevřené účty"}
+          </h1>
         </div>
         <div className="card skeleton" />
         <div className="card skeleton" />
@@ -135,7 +189,7 @@ export default function ReceiptsPage() {
   if (error) {
     return (
       <div className="container">
-        <h1 className="pageTitle">Uložené účtenky</h1>
+        <h1 className="pageTitle">Účtenky a účty</h1>
         <div className="alert alert-error">{error}</div>
       </div>
     );
@@ -144,12 +198,13 @@ export default function ReceiptsPage() {
   return (
     <div className="container">
       <div className="d-flex justify-content-between align-items-center my-3">
-        <h1 className="pageTitle my-0">Uložené účtenky</h1>
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}></div>
+        <h1 className="pageTitle my-0">
+          {viewMode === "receipts" ? "Uložené účtenky" : "Aktivní otevřené účty"}
+        </h1>
       </div>
 
       {/* FILTRY */}
-      <section className="card" style={{ marginBottom: "1rem", padding: "0.75rem" }}>
+      <section className="card mb-4" style={{ padding: "0.75rem" }}>
         <div className="grid2">
           <div
             style={{
@@ -167,7 +222,7 @@ export default function ReceiptsPage() {
                 id="q"
                 type="text"
                 className="input"
-                placeholder="ID, jméno, položky…"
+                placeholder="Název, položky…"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
               />
@@ -203,13 +258,13 @@ export default function ReceiptsPage() {
             style={{
               display: "grid",
               gap: "0.75rem",
-              gridTemplateColumns: "1fr 1fr 1fr",
+              gridTemplateColumns: "1fr 2fr",
               alignItems: "end",
             }}
           >
             <div>
               <label htmlFor="issued" className="form-label">
-                Issued to
+                {viewMode === "receipts" ? "Vystaveno pro" : "Název účtu / Stolu"}
               </label>
               <select
                 id="issued"
@@ -228,42 +283,70 @@ export default function ReceiptsPage() {
 
             <div>
               <label htmlFor="reset" className="form-label">
-                Zobrazeno: <strong>{filtered.length}</strong> / {receipts.length}
+                Zobrazeno: <strong>{filtered.length}</strong> / {viewMode === "receipts" ? receipts.length : tabs.length}
               </label>
-              <button
-                className="btn input"
-                onClick={() => {
-                  setQ("");
-                  setFrom("");
-                  setTo("");
-                  setIssuedTo("");
-                }}
-              >
-                Reset filtrů
-              </button>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    setQ("");
+                    setFrom("");
+                    setTo("");
+                    setIssuedTo("");
+                  }}
+                >
+                  Reset filtrů
+                </button>
+                <button
+                  className={`btn d-flex align-items-center gap-2 ${viewMode === "tabs" ? "btn-primary" : ""}`}
+                  onClick={() => {
+                    setViewMode(viewMode === "receipts" ? "tabs" : "receipts");
+                    // Reset filter states that may be invalid for the other dataset
+                    setIssuedTo("");
+                  }}
+                >
+                  {viewMode === "receipts" ? (
+                    <>
+                      <Fa.FaFolderOpen /> Zobrazit otevřené
+                    </>
+                  ) : (
+                    <>
+                      <Fa.FaReceipt /> Zobrazit uzavřené
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {filtered.length === 0 ? (
-        <p className="muted">Žádné uložené účtenky.</p>
+        <p className="muted">{viewMode === "receipts" ? "Žádné uložené účtenky." : "Žádné aktivní otevřené účty."}</p>
       ) : (
         <div className="grid">
           {filtered.map((r) => {
-            // Používáme r.items místo starého r.receipt
             const total = (r.items || []).reduce((sum, i) => sum + (i.price || 0), 0);
             return (
-              <section key={r.id} className="card receiptCard">
+              <section key={r.isTab ? `tab-${r.id}` : `receipt-${r.id}`} className="card receiptCard" style={{ borderColor: r.isTab ? "var(--info)" : "var(--border)" }}>
                 <header className="receiptHeader">
                   <div>
-                    <div className="receiptTitle">Účtenka #{r.id}</div>
+                    <div className="receiptTitle" style={{ color: r.isTab ? "var(--info)" : "inherit" }}>
+                      {r.isTab ? (
+                        <span className="d-flex align-items-center gap-2">
+                          <Fa.FaFolderOpen />
+                          {r.is_table ? `Stůl: ${r.issued_to}` : `Účet: ${r.issued_to}`}
+                        </span>
+                      ) : (
+                        `Účtenka #${r.id}`
+                      )}
+                    </div>
                     <div className="receiptSub">
                       {new Date(r.created_at).toLocaleString("cs-CZ")}
-                      {r.issued_to ? ` • Pro: ${r.issued_to}` : ""}
+                      {!r.isTab && r.issued_to ? ` • Pro: ${r.issued_to}` : ""}
                     </div>
                   </div>
-                  <button className="btn btn-danger" onClick={() => deleteReceipt(r.id)}>
+                  <button className="btn btn-danger" onClick={() => deleteItem(r.id, r.isTab)}>
                     <Fa.FaTrashCan />
                   </button>
                 </header>
@@ -278,8 +361,10 @@ export default function ReceiptsPage() {
                 </div>
 
                 <footer className="receiptTotal">
-                  <span>Celkem</span>
-                  <span className="totalPrice">{czk.format(total)}</span>
+                  <span>{r.isTab ? "Celkem k zaplacení" : "Celkem"}</span>
+                  <span className="totalPrice" style={{ color: r.isTab ? "var(--info)" : "inherit" }}>
+                    {czk.format(total)}
+                  </span>
                 </footer>
               </section>
             );
@@ -287,29 +372,31 @@ export default function ReceiptsPage() {
         </div>
       )}
 
-      <div
-        className="card cardPad"
-        style={{
-          marginBottom: 16,
-          marginTop: 16,
-          display: "flex",
-          gap: 12,
-          alignItems: "end",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-        }}
-      >
-        <div></div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            className="btn btn-danger"
-            style={{ display: "inline-flex", alignItems: "center" }}
-            onClick={deleteAllReceipts}
-          >
-            <Fa.FaTrashCan /> Smazat Vše
-          </button>
+      {viewMode === "receipts" && receipts.length > 0 && (
+        <div
+          className="card cardPad"
+          style={{
+            marginBottom: 16,
+            marginTop: 16,
+            display: "flex",
+            gap: 12,
+            alignItems: "end",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+          }}
+        >
+          <div></div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              className="btn btn-danger"
+              style={{ display: "inline-flex", alignItems: "center" }}
+              onClick={deleteAllReceipts}
+            >
+              <Fa.FaTrashCan /> Smazat Vše
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
