@@ -4,7 +4,7 @@
 [![Node.js CI Test](https://github.com/roboraptor/LocalPOSqlite/actions/workflows/node.js.test.yml/badge.svg)](https://github.com/roboraptor/LocalPOSqlite/actions/workflows/node.js.test.yml)
 
 A complete, locally-hosted Point of Sale (POS) and cash register web application built with **Next.js 15 (App Router)** + **React 19**, using **SQLite** (`better-sqlite3`) for reliable data storage.
-The project is designed for small businesses, cafes, pubs, or as an experimental local POS system.
+The project is designed for small businesses, cafes, pubs, or as an experimental local POS system. Enjoy the [screenshots](https://github.com/roboraptor/LocalPOSqlite/tree/V2/screenshots) !
 
 ---
 
