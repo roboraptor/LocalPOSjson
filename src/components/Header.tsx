@@ -16,6 +16,7 @@ export default function Header() {
     { href: "/", label: "Pokladna" },
     { href: "/items", label: "Položky" },
     { href: "/receipts", label: "Účtenky" },
+    { href: "/closing", label: "Uzávěrka" },
     { href: "/export", label: "Export" },
     { href: "/settings", label: "Nastavení" },
   ];
